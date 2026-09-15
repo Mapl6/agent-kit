@@ -19,7 +19,7 @@ Hermes-inspired `/learn` as a **Markdown procedure** (no runtime slash command).
 ## Prerequisites
 
 - Read `/agent/skills/AGENTS.md` and `/agent/improvement.md`
-- Prefer `npx create-agent-kit add-skill <name>` to scaffold
+- Prefer `npx @mapl6/agent-kit add-skill <name>` to scaffold
 
 ## Procedure
 

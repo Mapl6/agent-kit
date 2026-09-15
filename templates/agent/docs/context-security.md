@@ -12,6 +12,6 @@ when accepting kit changes from others or copying AGENTS from unknown repos.
 
 ## Good practice
 - Keep secrets in `.env` (gitignored); never in skills/memory/AGENTS
-- Prefer `npx create-agent-kit scan` over pasting huge dumps of internal docs
+- Prefer `npx @mapl6/agent-kit scan` over pasting huge dumps of internal docs
 - Review PRs that touch `/agent/` and `AGENTS.md` like production code
 - Use `AGENTS.override.md` / `SOUL.md` locally — do not commit personal secrets there either

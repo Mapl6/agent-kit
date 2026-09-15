@@ -1,22 +1,22 @@
-# AI Agent Kit (frontend-first)
+# Agent kit
 
-Tool-agnostic kit for Claude Code, Cursor, Copilot, Aider, Cline, etc.
-Hermes-inspired `SKILL.md` folders + improvement loop — **Markdown + CLI only**.
+Tool-agnostic kit for Cursor, Claude Code, Copilot, Aider, and Cline.
+Skills, memory, and an improvement loop — Markdown only.
 
-## Install / refresh
+## Refresh
 
 ```bash
-npx create-agent-kit          # init + scan project
-npx create-agent-kit scan     # re-detect stack; update generated sections
-npx create-agent-kit doctor
-npx create-agent-kit add-skill my-flow
+npx @mapl6/agent-kit scan
+npx @mapl6/agent-kit doctor
+npx @mapl6/agent-kit add-skill my-flow
 ```
 
 ## Layout
-- **`AGENTS.md`** — TOC + skill index
+
+- **`AGENTS.md`** — TOC + skill index (read this first)
 - **`/agent/skills/<name>/SKILL.md`** — playbooks
-- **`/agent/memory/`** — `MEMORY.md` (hot facts), `USER.md`, `session-log.md`
-- **`improvement.md` / `handoff.md`** — learn & transfer
+- **`/agent/memory/`** — hot facts, user prefs, session log
+- **`improvement.md` / `handoff.md`** — learn and transfer
 - **`docs/file-roles.md`** — which file does what
 
-Scan writes `<!-- agent-kit:generated:* -->` blocks you can re-run safely.
+Scan writes `<!-- agent-kit:generated:* -->` blocks. Your prose around them is kept.

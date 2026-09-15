@@ -9,7 +9,7 @@ const { scanProject, applyScanToKit, fillAllTokens } = require("./lib/scan-proje
 const PKG = require("../package.json");
 const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
 const TARGET_DIR = process.cwd();
-const KIT_VERSION = PKG.version || "1.2.0";
+const KIT_VERSION = PKG.version || "1.3.0";
 
 const SKILL_STUB = `---
 name: {{NAME}}
@@ -173,7 +173,7 @@ function runScan({ reportOnly = false } = {}) {
   }
 
   if (!fs.existsSync(path.join(TARGET_DIR, "AGENTS.md"))) {
-    console.log("\nNo AGENTS.md found. Run `npx create-agent-kit init` first.\n");
+    console.log("\nNo AGENTS.md found. Run `npx @mapl6/agent-kit init` first.\n");
     process.exit(1);
   }
 
@@ -211,15 +211,15 @@ async function promptValues(yes) {
 
 function printHelp() {
   console.log(`
-create-agent-kit v${KIT_VERSION} — frontend-first self-improving AGENTS.md kit
+agent-kit v${KIT_VERSION} — frontend-first self-improving AGENTS.md kit
 
 Usage:
-  npx create-agent-kit [init]       Scaffold kit, then scan the project
-  npx create-agent-kit scan         Re-read the project; refresh kit files
-  npx create-agent-kit enhance      Add any missing kit files (no overwrite)
-  npx create-agent-kit add-skill <name>
+  npx @mapl6/agent-kit [init]       Scaffold kit, then scan the project
+  npx @mapl6/agent-kit scan         Re-read the project; refresh kit files
+  npx @mapl6/agent-kit enhance      Add any missing kit files (no overwrite)
+  npx @mapl6/agent-kit add-skill <name>
                                     Scaffold agent/skills/<name>/SKILL.md
-  npx create-agent-kit doctor       Check kit health + print scan summary
+  npx @mapl6/agent-kit doctor       Check kit health + print scan summary
 
 Flags:
   --yes, -y       Skip prompts
@@ -252,14 +252,14 @@ async function cmdInit({ force, yes, noScan }) {
   console.log("Next steps:");
   console.log("  1. Review AGENTS.md and agent/docs (generated blocks are marked)");
   console.log("  2. Fill remaining [bracketed placeholders]");
-  console.log("  3. Commit — then re-run: npx create-agent-kit scan after stack changes");
-  console.log("  4. Grow skills via /agent/improvement.md or: npx create-agent-kit add-skill <name>\n");
+  console.log("  3. Commit — then re-run: npx @mapl6/agent-kit scan after stack changes");
+  console.log("  4. Grow skills via /agent/improvement.md or: npx @mapl6/agent-kit add-skill <name>\n");
 }
 
 async function cmdEnhance({ force }) {
   console.log(`\nEnhancing agent kit in: ${TARGET_DIR}\n`);
   if (!fs.existsSync(path.join(TARGET_DIR, "AGENTS.md")) && !force) {
-    console.log("No AGENTS.md found. Run `npx create-agent-kit init` first.\n");
+    console.log("No AGENTS.md found. Run `npx @mapl6/agent-kit init` first.\n");
     process.exit(1);
   }
   const { copied, skipped } = copyTemplates({ force, onlyMissing: !force });
@@ -290,7 +290,7 @@ async function cmdAddSkill(name) {
 }
 
 function cmdDoctor({ reportOnly }) {
-  console.log(`\nDoctor — create-agent-kit v${KIT_VERSION}\n`);
+  console.log(`\nDoctor — agent-kit v${KIT_VERSION}\n`);
   const required = [
     "AGENTS.md",
     path.join("agent", "improvement.md"),
@@ -312,7 +312,7 @@ function cmdDoctor({ reportOnly }) {
   }
   runScan({ reportOnly });
   if (!ok) {
-    console.log("Some core files missing — run: npx create-agent-kit enhance\n");
+    console.log("Some core files missing — run: npx @mapl6/agent-kit enhance\n");
     process.exit(1);
   }
 }
@@ -352,6 +352,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("create-agent-kit failed:", err.message);
+  console.error("agent-kit failed:", err.message);
   process.exit(1);
 });

@@ -6,7 +6,7 @@ under `/agent/`. See `/agent/docs/file-roles.md` for which file does what.
 
 This kit is **frontend-first** and **self-improving**: when workflows repeat, agents
 create or patch skills/rules (see `/agent/improvement.md`). After install, run
-`npx create-agent-kit scan` (also runs automatically on `init`) to read the repo
+`npx @mapl6/agent-kit scan` (also runs automatically on `init`) to read the repo
 and refresh generated sections.
 
 ## Quick rules
@@ -56,8 +56,8 @@ Authoring standards: `/agent/skills/AGENTS.md`
 See `/agent/skills/setup-env/SKILL.md`. Refresh kit from the repo anytime:
 
 ```bash
-npx create-agent-kit scan
-npx create-agent-kit doctor
+npx @mapl6/agent-kit scan
+npx @mapl6/agent-kit doctor
 ```
 
 ## First thing to read for any task

@@ -1,88 +1,121 @@
-# create-agent-kit
+# Agent Kit
 
-Scaffold a **frontend-first**, tool-agnostic `AGENTS.md` kit that **reads your
-project** and keeps skills, rules, docs, and memory in sync. Works with Claude
-Code, Cursor, GitHub Copilot, Aider, Cline, and any agent that reads Markdown.
+**One command to give Cursor, Claude Code, Copilot, Aider, and Cline a real project brain.**
 
-Inspired by Hermes Agent patterns (skills, memory budgets, learn loop, curator) —
-**plain Markdown + CLI**, not a Hermes runtime.
+Most `AGENTS.md` files are empty templates. Agent Kit **scans your frontend repo** and fills skills, rules, architecture, and memory from your actual stack.
+
+[![npm](https://img.shields.io/npm/v/@mapl6/agent-kit.svg)](https://www.npmjs.com/package/@mapl6/agent-kit)
+[![downloads](https://img.shields.io/npm/dw/@mapl6/agent-kit.svg)](https://www.npmjs.com/package/@mapl6/agent-kit)
+[![license](https://img.shields.io/npm/l/@mapl6/agent-kit.svg)](./LICENSE)
+[![stars](https://img.shields.io/github/stars/Mapl6/agent-kit?style=social)](https://github.com/Mapl6/agent-kit)
+
+```bash
+npx @mapl6/agent-kit
+```
+
+Works with any agent that reads Markdown. Plain files + a CLI — not another runtime.
+
+## Why this exists
+
+AI coding agents are only as good as the repo they land in. Without a kit they guess your stack, invent folder names, and skip tests.
+
+Agent Kit drops in an `AGENTS.md` that already knows your app:
+
+| Detects | Writes |
+|---|---|
+| Next.js, Vite, Remix, and friends | `AGENTS.md` + Cursor / Claude / Copilot pointers |
+| `app/` vs `src/` routing | `agent/docs/architecture.md` + `ui-architecture.md` |
+| npm / pnpm / yarn / bun | `agent/commands.md` |
+| ESLint, Prettier, Vitest, Playwright | `agent/rules/*` |
+| Your real scripts | `agent/memory/MEMORY.md` |
+
+Generated blocks are wrapped in HTML comments. Your own notes stay intact when you re-scan.
 
 ## Quick start
 
 ```bash
 cd your-frontend-app
-npx /path/to/create-agent-kit          # init + automatic project scan
-# after publishing:
-npx create-agent-kit
+npx @mapl6/agent-kit
 ```
 
-`init` copies the kit, then **scans** `package.json`, lockfiles, Next/Vite
-configs, `app/`/`src/` layout, ESLint/Vitest/Playwright, etc., and updates:
+Then open `AGENTS.md` and start a new Cursor / Claude / Copilot chat. The agent will follow the kit.
 
-- `AGENTS.md`, `agent/commands.md`, checklist/skills tokens
-- `agent/docs/architecture.md` + `ui-architecture.md` (generated blocks)
-- `agent/context/conventions.md`, `agent/rules/*`
-- `agent/memory/MEMORY.md` + a session-log entry
-- `.agent-kit.json` with full detection metadata
-
-Re-run anytime the stack changes:
+Stack changed later?
 
 ```bash
-npx create-agent-kit scan
+npx @mapl6/agent-kit scan
 ```
-
-Generated sections use HTML comment markers so **your prose is preserved** on re-scan.
 
 ## Commands
 
 | Command | What it does |
 |---|---|
-| `init` (default) | Scaffold kit, then scan the project |
-| `scan` | Re-read the repo; refresh generated kit sections |
-| `enhance` | Add missing kit files, then scan |
+| `init` (default) | Scaffold the kit, then scan the project |
+| `scan` | Re-read the repo and refresh generated sections |
+| `enhance` | Add any missing kit files, then scan |
 | `add-skill <name>` | Scaffold `agent/skills/<name>/SKILL.md` |
 | `doctor` | Health check + scan summary |
 
-Flags: `--yes` / `-y`, `--force` / `-f`, `--no-scan`, `--report`, `--help`
+```bash
+npx @mapl6/agent-kit --yes          # skip prompts
+npx @mapl6/agent-kit scan --report  # print detection JSON
+npx @mapl6/agent-kit doctor
+npx @mapl6/agent-kit add-skill checkout-flow
+```
 
 ## What you get
 
-```
-AGENTS.md + vendor pointers (Claude / Cursor / Copilot)
-SOUL.md.example, AGENTS.override.md.example
-.agent-kit.json          ← version + last scan
+```text
+AGENTS.md                 ← short TOC every agent reads first
+CLAUDE.md / .cursorrules  ← vendor pointers back to AGENTS.md
+.agent-kit.json           ← version + last scan
 agent/
-  skills/<name>/SKILL.md ← Hermes-style playbooks (+ learn-from-source, CURATOR)
-  skill-bundles/         ← multi-skill job aliases
-  memory/                ← MEMORY.md, USER.md, session-log.md
-  docs/                  ← architecture, UI, file-roles, context-security
-  improvement.md         ← promote lessons over time
-  handoff.md             ← chat → chat transfer
-  rules/, context/, …
+  skills/                 ← playbooks (setup, feature, a11y, debug, deploy…)
+  memory/                 ← MEMORY.md, USER.md, session-log.md
+  docs/                   ← architecture, UI, data, file roles
+  rules/                  ← coding, git, security, testing
+  context/                ← conventions, glossary, known issues
+  improvement.md          ← promote lessons over time
+  handoff.md              ← continue the same work in a new chat
 ```
 
-## Self-improvement
+## How the loop works
 
-1. Work with Cursor / Claude / Copilot — they read `AGENTS.md`
-2. Log sessions → promote facts to `MEMORY.md` / skills / rules (`improvement.md`)
-3. "Learn this" → `/agent/skills/learn-from-source/SKILL.md` or `add-skill`
-4. Periodic hygiene → `/agent/skills/CURATOR.md`
-5. Stack change → `npx create-agent-kit scan`
+```mermaid
+flowchart LR
+  A[You ship a feature] --> B[Session log]
+  B --> C[MEMORY / skills / rules]
+  C --> D[Next chat starts smarter]
+  E[Stack changes] --> F["npx @mapl6/agent-kit scan"]
+  F --> C
+```
 
-## Making the kit even better (roadmap ideas)
+1. Agents read `AGENTS.md` and load a skill only when the task matches.
+2. After real work, they append `agent/memory/session-log.md`.
+3. Durable facts move into `MEMORY.md`, a new skill, or a rule.
+4. Re-scan when you add Next, Playwright, a new package manager, and so on.
 
-Already included from Hermes (Markdown ports): skill folders, progressive
-disclosure, MEMORY/USER budgets, learn-from-source, curator-lite, SOUL/override,
-file-roles, context-security, skill bundles, project scan.
+## Works with
 
-Still runtime-only in Hermes (not ported on purpose): memory tool, curator
-daemon, MCP gateway, session_search DB, background self-improvement forks.
+Cursor · Claude Code · GitHub Copilot · Aider · Cline · any Markdown-reading agent
 
-Nice future kit upgrades: monorepo nested `AGENTS.md` stubs per package,
-`skills-audit` CLI, DESIGN.md hook, CI "kit drift" check via `scan --report`.
+Inspired by Hermes-style agent patterns (skills, memory budgets, learn loop) — ported to **plain Markdown**, not a Hermes runtime.
 
-## Publish
+## FAQ
+
+**Will it overwrite my docs?**  
+Only the `<!-- agent-kit:generated:* -->` blocks. Everything else is yours.
+
+**Frontend only?**  
+It is frontend-first (Next, Vite, routing, a11y, UI QA). It still works in other Node repos; detection will just be thinner.
+
+**Do I need an account?**  
+No. `npx @mapl6/agent-kit` is enough.
+
+## Star & share
+
+If this saves you a setup hour, [star the repo](https://github.com/Mapl6/agent-kit) so other frontend teams can find it. Issues and PRs are welcome.
 
 ```bash
-npm login && npm publish
+npx @mapl6/agent-kit
 ```

@@ -37,10 +37,10 @@ Periodically skim `/agent/memory/session-log.md` and:
 ## CLI helpers
 
 ```bash
-npx create-agent-kit scan             # re-read the project; refresh generated kit sections
-npx create-agent-kit enhance          # add any new kit files you don't have yet
-npx create-agent-kit add-skill <name> # scaffold a new SKILL.md stub
-npx create-agent-kit doctor           # health check + scan summary
+npx @mapl6/agent-kit scan             # re-read the project; refresh generated kit sections
+npx @mapl6/agent-kit enhance          # add any new kit files you don't have yet
+npx @mapl6/agent-kit add-skill <name> # scaffold a new SKILL.md stub
+npx @mapl6/agent-kit doctor           # health check + scan summary
 ```
 
 ## Skip saving (noise)

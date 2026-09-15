@@ -1,29 +1,51 @@
 {
-  "name": "create-agent-kit",
-  "version": "1.2.0",
-  "description": "Frontend-first AGENTS.md kit: scan your repo to fill skills/rules/docs/memory, Hermes-inspired self-improvement, works with Claude Code, Cursor, Copilot, and more.",
+  "name": "@mapl6/agent-kit",
+  "version": "1.3.0",
+  "description": "Give Cursor, Claude Code, and Copilot a real project brain. Scans your repo and scaffolds AGENTS.md, skills, rules, docs, and memory.",
+  "author": "Mapl6 <mahdi.am6@gmail.com>",
+  "license": "MIT",
   "bin": {
-    "create-agent-kit": "bin/cli.js"
+    "agent-kit": "bin/cli.js"
   },
+  "main": "bin/cli.js",
   "files": [
     "bin",
-    "templates"
+    "templates",
+    "LICENSE"
   ],
+  "scripts": {
+    "start": "node bin/cli.js",
+    "test": "node bin/cli.js --help"
+  },
   "engines": {
     "node": ">=16"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mapl6/agent-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Mapl6/agent-kit/issues"
+  },
+  "homepage": "https://github.com/Mapl6/agent-kit#readme",
   "keywords": [
-    "ai",
-    "agents",
     "agents.md",
-    "frontend",
-    "skills",
+    "ai-agents",
     "cursor",
-    "claude",
-    "copilot",
+    "claude-code",
+    "github-copilot",
+    "aider",
+    "cline",
+    "frontend",
+    "nextjs",
+    "vite",
+    "skills",
     "scaffold",
-    "self-improving",
-    "scan"
-  ],
-  "license": "MIT"
+    "cli",
+    "llm",
+    "developer-tools"
+  ]
 }

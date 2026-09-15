@@ -25,7 +25,7 @@ tags: [meta, skills, authoring]
 2. Name it: lowercase hyphens (`add-ui-page`, not `AddUIPage`).
 3. Scaffold with CLI when possible:
    ```bash
-   npx create-agent-kit add-skill <name>
+   npx @mapl6/agent-kit add-skill <name>
    ```
    Or create `agent/skills/<name>/SKILL.md` by hand.
 4. Fill frontmatter: `name`, `description` (≤60 chars, ends with `.`), `version`, `tags`.

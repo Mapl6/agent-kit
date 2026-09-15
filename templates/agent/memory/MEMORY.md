@@ -7,5 +7,5 @@ Prefer facts agents need every session: stack, ports, non-obvious conventions, l
 Skip anything already in `AGENTS.md` / skills / SOUL. Narrative goes in `session-log.md`.
 
 <!-- agent-kit:generated:memory:start -->
-[Run `npx create-agent-kit scan` to seed this from the project.]
+[Run `npx @mapl6/agent-kit scan` to seed this from the project.]
 <!-- agent-kit:generated:memory:end -->

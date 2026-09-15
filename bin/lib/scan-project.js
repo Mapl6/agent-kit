@@ -383,7 +383,7 @@ ${folderTree || "(no top-level dirs detected)"}
 - Features: \`${meta.paths.features || "[not found — fill in]"}\`
 - Lib/utils: \`${meta.paths.lib || "[not found — fill in]"}\`
 
-> Edit prose above/below this block freely. Re-run \`npx create-agent-kit scan\` to refresh the generated section only.`;
+> Edit prose above/below this block freely. Re-run \`npx @mapl6/agent-kit scan\` to refresh the generated section only.`;
 
   if (
     patchOrCreate(root, path.join("agent", "docs", "architecture.md"), (prev) => {
@@ -493,7 +493,7 @@ ${signals.hasPlaywright || signals.hasCypress ? "- For exploratory UI QA use `/a
   const logPath = path.join(root, "agent", "memory", "session-log.md");
   const logEntry = `
 ## ${meta.scannedAt} — Agent kit project scan
-- Agent: create-agent-kit scan
+- Agent: agent-kit scan
 - Task: Auto-detect stack and refresh kit generated sections
 - Outcome: Done
 - Notes: preset=${meta.preset}; pm=${meta.packageManager}; framework=${meta.framework}; routing=${meta.routing}
@@ -523,8 +523,8 @@ ${signals.hasPlaywright || signals.hasCypress ? "- For exploratory UI QA use `/a
         "| `skill-authoring` | Create or patch in-repo SKILL.md playbooks correctly. |\n| `learn-from-source` | Turn a path, URL, or session into a new skill. |"
       );
     }
-    const scanNote = `- Last scan: ${meta.scannedAt} (preset \`${meta.preset}\`) — re-run \`npx create-agent-kit scan\` after big stack changes`;
-    if (!next.includes("npx create-agent-kit scan")) {
+    const scanNote = `- Last scan: ${meta.scannedAt} (preset \`${meta.preset}\`) — re-run \`npx @mapl6/agent-kit scan\` after big stack changes`;
+    if (!next.includes("npx @mapl6/agent-kit scan")) {
       next = next.replace(
         "## Quick rules\n",
         `## Quick rules\n${scanNote}\n`
