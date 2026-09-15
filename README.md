@@ -38,7 +38,7 @@ cd your-frontend-app
 npx @mapl6/agent-kit
 ```
 
-Then open `AGENTS.md` and start a new Cursor / Claude / Copilot chat. The agent will follow the kit.
+Then open root `AGENTS.md`. The agent must read the listed `/agent/` files in order, then follow the matching skill step by step.
 
 Stack changed later?
 
@@ -66,7 +66,7 @@ npx @mapl6/agent-kit add-skill checkout-flow
 ## What you get
 
 ```text
-AGENTS.md                 ← short TOC every agent reads first
+AGENTS.md                 ← root operating procedure (read /agent files in order)
 CLAUDE.md / .cursorrules  ← vendor pointers back to AGENTS.md
 .agent-kit.json           ← version + last scan
 agent/
@@ -90,7 +90,7 @@ flowchart LR
   F --> C
 ```
 
-1. Agents read `AGENTS.md` and load a skill only when the task matches.
+1. Agents read root `AGENTS.md`, then the `/agent/` files it lists, **in order**.
 2. After real work, they append `agent/memory/session-log.md`.
 3. Durable facts move into `MEMORY.md`, a new skill, or a rule.
 4. Re-scan when you add Next, Playwright, a new package manager, and so on.
@@ -103,8 +103,8 @@ Inspired by Hermes-style agent patterns (skills, memory budgets, learn loop) —
 
 ## FAQ
 
-**Will it overwrite my docs?**  
-Only the `<!-- agent-kit:generated:* -->` blocks. Everything else is yours.
+**Will it overwrite my files?**  
+If `AGENTS.md` already exists at the project root, the kit is **appended at the end** (a short pointer is added at the top). Other kit files are skipped if they already exist (`--force` overwrites). Generated `<!-- agent-kit:generated:* -->` blocks can be re-scanned without wiping your prose.
 
 **Frontend only?**  
 It is frontend-first (Next, Vite, routing, a11y, UI QA). It still works in other Node repos; detection will just be thinner.

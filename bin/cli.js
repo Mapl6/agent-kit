@@ -9,7 +9,7 @@ const { scanProject, applyScanToKit, fillAllTokens } = require("./lib/scan-proje
 const PKG = require("../package.json");
 const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
 const TARGET_DIR = process.cwd();
-const KIT_VERSION = PKG.version || "1.3.0";
+const KIT_VERSION = PKG.version || "1.4.0";
 
 const SKILL_STUB = `---
 name: {{NAME}}
@@ -86,26 +86,97 @@ function walk(dir) {
   return out;
 }
 
+const KIT_START = "<!-- agent-kit:start -->";
+const KIT_END = "<!-- agent-kit:end -->";
+const POINTER_START = "<!-- agent-kit:pointer -->";
+const POINTER_END = "<!-- agent-kit:pointer:end -->";
+const POINTER_BLOCK = `${POINTER_START}
+**Agent Kit is in this file.** Before you write code, go to the Agent Kit section at the **bottom** and follow it step by step.
+${POINTER_END}
+`;
+
+function wrapAgentsKit(templateText) {
+  const body = String(templateText || "").trim();
+  if (body.includes(KIT_START) && body.includes(KIT_END)) return `${body}\n`;
+  return `${KIT_START}\n${body}\n${KIT_END}\n`;
+}
+
+function hasAgentsKit(content) {
+  return Boolean(content) && content.includes(KIT_START) && content.includes(KIT_END);
+}
+
+function installAgentsMd(src, dest, { force }) {
+  const kit = wrapAgentsKit(fs.readFileSync(src, "utf8"));
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+
+  if (!fs.existsSync(dest)) {
+    fs.writeFileSync(dest, kit, "utf8");
+    console.log("  create AGENTS.md");
+    return "create";
+  }
+
+  if (force) {
+    fs.writeFileSync(dest, kit, "utf8");
+    console.log("  overwrite AGENTS.md");
+    return "overwrite";
+  }
+
+  const existing = fs.readFileSync(dest, "utf8");
+  if (hasAgentsKit(existing)) {
+    console.log("  skip   AGENTS.md (kit section already present — use --force to replace it)");
+    return "skip";
+  }
+
+  let next = `${existing.trimEnd()}\n\n${kit}`;
+  if (!existing.includes(POINTER_START)) {
+    next = `${POINTER_BLOCK}\n${next}`;
+  }
+  fs.writeFileSync(dest, next, "utf8");
+  console.log("  append AGENTS.md (kept your file, added Agent Kit at the end)");
+  return "append";
+}
+
 function copyTemplates({ force, onlyMissing }) {
   const files = walk(TEMPLATES_DIR);
   let copied = 0;
   let skipped = 0;
+  const agentsSrc = files.find((src) => path.relative(TEMPLATES_DIR, src).replace(/\\/g, "/") === "AGENTS.md");
+  const rest = files.filter((src) => src !== agentsSrc);
+  const ordered = agentsSrc ? [agentsSrc, ...rest] : rest;
 
-  for (const src of files) {
-    const rel = path.relative(TEMPLATES_DIR, src);
+  for (const src of ordered) {
+    const rel = path.relative(TEMPLATES_DIR, src).replace(/\\/g, "/");
     const dest = path.join(TARGET_DIR, rel);
-    const exists = fs.existsSync(dest);
 
-    if (exists && (onlyMissing || !force)) {
-      console.log(`  skip   ${rel}${onlyMissing ? "" : " (already exists — use --force to overwrite)"}`);
-      skipped++;
-      continue;
+    try {
+      if (rel === "AGENTS.md") {
+        const exists = fs.existsSync(dest);
+        if (onlyMissing && exists && hasAgentsKit(fs.readFileSync(dest, "utf8"))) {
+          console.log("  skip   AGENTS.md");
+          skipped++;
+          continue;
+        }
+        const action = installAgentsMd(src, dest, { force });
+        if (action === "skip") skipped++;
+        else copied++;
+        continue;
+      }
+
+      const exists = fs.existsSync(dest);
+
+      if (exists && (onlyMissing || !force)) {
+        console.log(`  skip   ${rel}${onlyMissing ? "" : " (already exists — use --force to overwrite)"}`);
+        skipped++;
+        continue;
+      }
+
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      fs.copyFileSync(src, dest);
+      console.log(`  create ${rel}`);
+      copied++;
+    } catch (err) {
+      console.log(`  warn   ${rel} (${err.message})`);
     }
-
-    fs.mkdirSync(path.dirname(dest), { recursive: true });
-    fs.copyFileSync(src, dest);
-    console.log(`  create ${rel}`);
-    copied++;
   }
 
   return { copied, skipped };
@@ -131,20 +202,20 @@ function appendSkillIndex(skillName, description) {
     console.log(`  skip   skill already listed in AGENTS.md`);
     return;
   }
-  const marker = "## Skill index";
+  const marker = "## 3. Which skill to load";
   const idx = content.indexOf(marker);
   if (idx === -1) {
-    content += `\n\n## Skill index\n\n| Skill | Description |\n|---|---|\n${row}\n`;
+    content += `\n\n## 3. Which skill to load\n\n| Skill | When to read it |\n|---|---|\n${row}\n`;
     fs.writeFileSync(agentsPath, content, "utf8");
-    console.log("  update AGENTS.md (added Skill index)");
+    console.log("  update AGENTS.md (added skill index)");
     return;
   }
-  const tableHeader = "| Skill | Description |";
+  const tableHeader = "| Skill | When to read it |";
   const fromTable = content.indexOf(tableHeader, idx);
   if (fromTable === -1) {
     content = content.replace(
       marker,
-      `${marker}\n\n| Skill | Description |\n|---|---|\n${row}\n`
+      `${marker}\n\n| Skill | When to read it |\n|---|---|\n${row}\n`
     );
   } else {
     const lines = content.slice(fromTable).split("\n");
@@ -214,7 +285,8 @@ function printHelp() {
 agent-kit v${KIT_VERSION} — frontend-first self-improving AGENTS.md kit
 
 Usage:
-  npx @mapl6/agent-kit [init]       Scaffold kit, then scan the project
+  npx @mapl6/agent-kit [init]       Scaffold kit at repo root, then scan
+                                    If AGENTS.md exists, the kit is appended
   npx @mapl6/agent-kit scan         Re-read the project; refresh kit files
   npx @mapl6/agent-kit enhance      Add any missing kit files (no overwrite)
   npx @mapl6/agent-kit add-skill <name>

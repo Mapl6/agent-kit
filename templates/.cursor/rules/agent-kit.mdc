@@ -1,17 +1,15 @@
 ---
-description: Follow the repo agent kit (AGENTS.md and /agent/)
+description: Follow root AGENTS.md, then read /agent files in order before coding
 alwaysApply: true
 ---
 
 # Agent kit
 
-This project uses a tool-agnostic agent kit.
-
-1. Read and follow root `AGENTS.md` first.
-2. Load detail from `/agent/` as linked from `AGENTS.md` (rules, skills, docs, context, memory).
-3. For repeatable workflows use `/agent/skills/<name>/SKILL.md`.
-4. After non-trivial tasks, update `/agent/memory/session-log.md` and follow `/agent/improvement.md`.
-5. To continue in a new chat, use `/agent/handoff.md`.
+1. Read root `AGENTS.md` (the Agent Kit section) and follow it in order.
+2. Before writing code, read the files listed in AGENTS.md §1, one by one.
+3. Then follow AGENTS.md §2 and the matching `/agent/skills/<name>/SKILL.md`.
+4. After non-trivial work: `/agent/checklist.md` → session-log → `/agent/improvement.md`.
+5. Mid-task new chat → `/agent/handoff.md`.
 6. After stack changes, remind the user to run `npx @mapl6/agent-kit scan`.
 
-Do not invent a parallel instruction system — keep improvements inside `/agent/` and `AGENTS.md`.
+Do not start implementing until the read sequence is done. Do not invent a parallel instruction system.

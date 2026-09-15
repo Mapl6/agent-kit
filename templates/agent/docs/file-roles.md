@@ -4,7 +4,7 @@ Hermes-inspired map so agents do not dump everything into one file.
 
 | File | Role | Who writes | Hot every session? |
 |---|---|---|---|
-| `AGENTS.md` | Project TOC + quick rules + skill index | Humans + kit | Yes |
+| `AGENTS.md` | Root operating procedure: read `/agent/` files in order, then work step by step | Humans + kit | Yes |
 | `AGENTS.override.md` | Personal overrides (gitignored) | You | If present |
 | `SOUL.md` | Persona / voice (gitignored) | You | If present |
 | `/agent/rules/*` | Always/never constraints | Humans + agents | Yes (relevant) |
@@ -19,10 +19,10 @@ Hermes-inspired map so agents do not dump everything into one file.
 | `/agent/skills/CURATOR.md` | Skill hygiene / archive policy | Humans | Periodic |
 | `.agent-kit.json` | Kit version + last scan metadata | CLI | Tooling |
 
-## Progressive disclosure
+## How to load context
 
-1. Read `AGENTS.md` skill **index** (name + short description only)
-2. Open the matching `SKILL.md` when the task matches
-3. Open `references/` only for deep detail
+1. Follow root `AGENTS.md` §1 and **read** the listed `/agent/` files in order (permissions, memory, docs, rules, commands).
+2. Then open **one** matching `/agent/skills/<name>/SKILL.md` and follow its Procedure.
+3. Open `references/` only for deep detail.
 
-Never paste the entire skill catalog into a chat prompt.
+Do not skip the read sequence. Do not dump every skill into the prompt — only the matching one.

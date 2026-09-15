@@ -13,7 +13,7 @@ npx @mapl6/agent-kit add-skill my-flow
 
 ## Layout
 
-- **`AGENTS.md`** — TOC + skill index (read this first)
+- **`AGENTS.md`** — root operating procedure (read `/agent/` files in order, then work)
 - **`/agent/skills/<name>/SKILL.md`** — playbooks
 - **`/agent/memory/`** — hot facts, user prefs, session log
 - **`improvement.md` / `handoff.md`** — learn and transfer

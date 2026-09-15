@@ -1,5 +1,6 @@
 # CLAUDE.md
 
-See [AGENTS.md](./AGENTS.md) for all project instructions, rules, skills, and docs.
-This file exists only because Claude Code looks for it by name — the content lives
-in AGENTS.md so it stays in sync across every AI tool used on this repo.
+Read [AGENTS.md](./AGENTS.md) at the project root first. Follow its numbered
+read sequence, then do the work step by step. Do not start coding until §1 is done.
+This file exists only because Claude Code looks for it by name.
+

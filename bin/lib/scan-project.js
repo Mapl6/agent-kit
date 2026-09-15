@@ -510,27 +510,23 @@ ${signals.hasPlaywright || signals.hasCypress ? "- For exploratory UI QA use `/a
     }
   }
 
-  // AGENTS.md quick stack line if still placeholder-ish
+  // AGENTS.md scan facts (keeps any user-written content outside the kit block)
   patchOrCreate(root, "AGENTS.md", (prev) => {
     if (!prev) return prev;
     let next = prev;
     if (next.includes("{{STACK}}")) next = next.replace(/\{\{STACK\}\}/g, tokens.STACK);
-    if (next.includes("{{PROJECT_NAME}}")) next = next.replace(/\{\{PROJECT_NAME\}\}/g, tokens.PROJECT_NAME);
-    // ensure learn-from-source in skill index
-    if (!next.includes("`learn-from-source`") && next.includes("## Skill index")) {
-      next = next.replace(
-        "| `skill-authoring` | Create or patch in-repo SKILL.md playbooks correctly. |",
-        "| `skill-authoring` | Create or patch in-repo SKILL.md playbooks correctly. |\n| `learn-from-source` | Turn a path, URL, or session into a new skill. |"
-      );
+    if (next.includes("{{PROJECT_NAME}}")) {
+      next = next.replace(/\{\{PROJECT_NAME\}\}/g, tokens.PROJECT_NAME);
     }
-    const scanNote = `- Last scan: ${meta.scannedAt} (preset \`${meta.preset}\`) — re-run \`npx @mapl6/agent-kit scan\` after big stack changes`;
-    if (!next.includes("npx @mapl6/agent-kit scan")) {
+    const scanBody = `- Project: ${tokens.PROJECT_NAME}
+- Stack: ${tokens.STACK}
+- Last scan: ${meta.scannedAt} (preset \`${meta.preset}\`) — re-run \`npx @mapl6/agent-kit scan\` after stack changes`;
+    next = upsertGeneratedBlock(next, "scan", scanBody);
+    if (!next.includes("`learn-from-source`") && next.includes("| Skill |")) {
       next = next.replace(
-        "## Quick rules\n",
-        `## Quick rules\n${scanNote}\n`
+        "| `skill-authoring` | Create or patch a `SKILL.md`. |",
+        "| `skill-authoring` | Create or patch a `SKILL.md`. |\n| `learn-from-source` | Turn a path, URL, or session into a new skill. |"
       );
-    } else {
-      next = next.replace(/- Last scan:.*\n/, `${scanNote}\n`);
     }
     if (next !== prev) updated.push("AGENTS.md");
     return next;

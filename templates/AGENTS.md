@@ -1,81 +1,83 @@
-# AGENTS.md — {{PROJECT_NAME}}
+<!-- agent-kit:start -->
+# Agent Kit — {{PROJECT_NAME}}
 
-Entry point for any AI coding agent (Claude Code, Cursor, Copilot, Aider, Cline,
-etc.). Keep this file short — table of contents, not the full manual. Detail lives
-under `/agent/`. See `/agent/docs/file-roles.md` for which file does what.
+You are an AI coding agent in this repo. **Do not write code until you finish §1.**
+Follow this file in order. Detail lives under `/agent/` — read those files; do not guess.
 
-This kit is **frontend-first** and **self-improving**: when workflows repeat, agents
-create or patch skills/rules (see `/agent/improvement.md`). After install, run
-`npx @mapl6/agent-kit scan` (also runs automatically on `init`) to read the repo
-and refresh generated sections.
-
-## Quick rules
+<!-- agent-kit:generated:scan:start -->
+- Project: {{PROJECT_NAME}}
 - Stack: {{STACK}}
-- No secrets committed — use `.env` (see `.env.example`)
-- Prefer existing components and design tokens over one-off UI
-- New interactive UI gets an accessibility pass (`/agent/skills/accessibility-pass/SKILL.md`)
-- Follow existing folder structure; don't invent top-level dirs without asking
-- All non-trivial features need a matching test
-- If `AGENTS.override.md` or `SOUL.md` exist locally, honor them for this developer
+- Last scan: not yet — run `npx @mapl6/agent-kit scan` after stack changes
+<!-- agent-kit:generated:scan:end -->
 
-## Where to look
-| Need | Go to |
+## 1. Read these files first (every task, in this order)
+
+Open each file and actually read it. Skip a path only if it does not exist, and say so.
+
+1. `/agent/permissions.md` — what you may do without asking, and what is forbidden
+2. `/agent/memory/MEMORY.md` — short project facts (stack, ports, gotchas)
+3. `/agent/memory/USER.md` — this developer's preferences
+4. `/agent/docs/architecture.md` — how the system is shaped
+5. `/agent/docs/ui-architecture.md` — routing, pages, components
+6. `/agent/docs/file-roles.md` — which kit file does what
+7. `/agent/context/conventions.md` — how this repo is written
+8. `/agent/context/known-issues.md` — landmines
+9. `/agent/rules/coding-style.md`
+10. `/agent/rules/security.md`
+11. `/agent/rules/testing.md`
+12. `/agent/rules/git-workflow.md`
+13. `/agent/commands.md` — exact install / dev / test / lint / build commands
+14. `/agent/memory/session-log.md` — last few entries only
+15. The matching skill in §3 (read the **whole** `SKILL.md`, not just the index row)
+16. `AGENTS.override.md` and `SOUL.md` if they exist (they win for this developer)
+
+Do not invent a second instruction system. If you need more detail, it is already under `/agent/`.
+
+## 2. Then do the work, one step at a time
+
+1. Restate the user goal in one sentence.
+2. Follow the matching skill's **Procedure** in order. Do not skip steps.
+3. Run commands from `/agent/commands.md` only — do not invent script names.
+4. Reuse existing components, design tokens, and folders. Ask before creating a new top-level directory.
+5. Never commit secrets. Use `.env` (see `.env.example`).
+6. New interactive UI → after it exists, follow `/agent/skills/accessibility-pass/SKILL.md`.
+7. Every non-trivial change needs a matching test.
+8. If you are stuck, follow `/agent/skills/systematic-debugging/SKILL.md` (or `/agent/skills/debug-common-issues/SKILL.md` for known local/CI gotchas).
+
+## 3. Which skill to load
+
+Pick **one** row, then read that `SKILL.md` fully before acting.
+
+| Skill | When to read it |
 |---|---|
-| Coding style, security, git, testing | `/agent/rules/` |
-| Step-by-step playbooks (`SKILL.md`) | `/agent/skills/` |
-| Architecture, UI, client data, file roles | `/agent/docs/` |
-| Glossary, conventions, known issues | `/agent/context/` |
-| Hot facts / user prefs | `/agent/memory/MEMORY.md`, `USER.md` |
-| Session activity log | `/agent/memory/session-log.md` |
-| Improve skills/rules over time | `/agent/improvement.md` |
-| Transfer work to a new chat | `/agent/handoff.md` |
-| Skill hygiene / archive | `/agent/skills/CURATOR.md` |
-| Multi-skill jobs | `/agent/skill-bundles/` |
-| Exact commands | `/agent/commands.md` |
-| Autonomy / definition of done | `/agent/permissions.md`, `checklist.md` |
-
-## Skill index
-Load the full `SKILL.md` only when the task matches (progressive disclosure).
-
-| Skill | Description |
-|---|---|
-| `setup-env` | Clone, install, env, and start the frontend locally. |
-| `add-new-feature` | Ship a frontend feature with tests and docs updates. |
+| `setup-env` | Clone, install, env, start the app locally. |
+| `add-new-feature` | Ship a feature with tests and docs. |
 | `add-ui-page` | Add a route or page with components and navigation. |
-| `accessibility-pass` | Keyboard, semantics, and contrast check for UI changes. |
-| `dogfood-ui` | Exploratory browser QA with evidence and a bug report. |
-| `systematic-debugging` | Reproduce, isolate, fix, and regress frontend bugs. |
-| `debug-common-issues` | Lookup table of recurring local and CI frontend gotchas. |
-| `deploy` | Verify, merge, and deploy frontend with safe rollback. |
-| `skill-authoring` | Create or patch in-repo SKILL.md playbooks correctly. |
+| `accessibility-pass` | Keyboard, semantics, and contrast for UI you just changed. |
+| `dogfood-ui` | Exploratory browser QA with evidence. |
+| `systematic-debugging` | Reproduce, isolate, fix, and regress a bug. |
+| `debug-common-issues` | Recurring local / CI frontend gotchas. |
+| `deploy` | Verify, merge, and deploy with rollback. |
+| `skill-authoring` | Create or patch a `SKILL.md`. |
 | `learn-from-source` | Turn a path, URL, or session into a new skill. |
 
-Authoring standards: `/agent/skills/AGENTS.md`
+Skill files live at `/agent/skills/<name>/SKILL.md`. Authoring rules: `/agent/skills/AGENTS.md`.
 
-## Setup
-See `/agent/skills/setup-env/SKILL.md`. Refresh kit from the repo anytime:
+If nothing matches: still follow §2, then §4.
 
-```bash
-npx @mapl6/agent-kit scan
-npx @mapl6/agent-kit doctor
-```
+## 4. When you are done (in this order)
 
-## First thing to read for any task
-1. `/agent/memory/MEMORY.md` — curated hot facts (from scan + lessons)
-2. `/agent/docs/ui-architecture.md` — UI/routing/component shape
-3. `/agent/docs/architecture.md` — system overview
-4. `/agent/memory/session-log.md` — recent related work
-5. Matching skill under `/agent/skills/<name>/SKILL.md`
+1. `/agent/checklist.md` — tick every box that applies
+2. Append `/agent/memory/session-log.md` for non-trivial work
+3. Promote lasting facts with `/agent/improvement.md` (MEMORY, a rule, or a new skill)
+4. If the chat is ending mid-task, fill `/agent/handoff.md`
 
-## Improvement loop
-- After non-trivial work → append `/agent/memory/session-log.md`
-- Durable short facts → `/agent/memory/MEMORY.md` (keep under budget)
-- Repeatable workflow / "learn this" → `learn-from-source` or `skill-authoring`
-- Always/never constraint → patch `/agent/rules/`
-- New chat mid-task → `/agent/handoff.md`
-- Details: `/agent/improvement.md`
+## 5. Hard rules
 
-## After finishing any non-trivial task
-1. Run `/agent/checklist.md`
-2. Append a session-log entry
-3. Promote durable lessons per `/agent/improvement.md`
+- Stack: {{STACK}}
+- Prefer existing UI patterns over one-off components
+- Do not disable tests, lint, or security checks to make a build pass
+- Do not deploy to production without explicit human approval (`/agent/permissions.md`)
+- Refresh this kit after stack changes: `npx @mapl6/agent-kit scan`
+
+<!-- agent-kit:end -->
