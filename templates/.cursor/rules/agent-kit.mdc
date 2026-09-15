@@ -5,11 +5,12 @@ alwaysApply: true
 
 # Agent kit
 
-1. Read root `AGENTS.md` (the Agent Kit section) and follow it in order.
-2. Before writing code, read the files listed in AGENTS.md §1, one by one.
-3. Then follow AGENTS.md §2 and the matching `/agent/skills/<name>/SKILL.md`.
-4. After non-trivial work: `/agent/checklist.md` → session-log → `/agent/improvement.md`.
-5. Mid-task new chat → `/agent/handoff.md`.
-6. After stack changes, remind the user to run `npx @mapl6/agent-kit scan`.
+1. If kit files still have many `[placeholders]`, tell the user to run the bootstrap prompt in `/agent/bootstrap-prompt.md` (also AGENTS.md §0) before feature work.
+2. Read root `AGENTS.md` (Agent Kit section) and follow it in order.
+3. Before writing code, read the files listed in AGENTS.md §1, one by one.
+4. For every answer: follow AGENTS.md §2 — apply matching skill + rules; revise if a rule/skill step was skipped.
+5. After non-trivial work: `/agent/checklist.md` → session-log → `/agent/improvement.md` so future answers improve.
+6. Mid-task new chat → `/agent/handoff.md`.
+7. After stack changes, remind the user to run `npx @mapl6/agent-kit scan`.
 
-Do not start implementing until the read sequence is done. Do not invent a parallel instruction system.
+Do not start product work until the read sequence is done. Do not invent a parallel instruction system.

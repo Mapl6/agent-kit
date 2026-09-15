@@ -38,7 +38,9 @@ cd your-frontend-app
 npx @mapl6/agent-kit
 ```
 
-Then open root `AGENTS.md`. The agent must read the listed `/agent/` files in order, then follow the matching skill step by step.
+**First chat (required):** open a new agent chat and paste the prompt from `agent/bootstrap-prompt.md` (also at the top of `AGENTS.md`). That fills docs, rules, and memory from your **real** project.
+
+After that, every task: the agent reads `/agent/` files in order, follows a skill, applies rules, and improves the answer before finishing.
 
 Stack changed later?
 

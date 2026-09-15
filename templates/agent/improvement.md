@@ -18,12 +18,13 @@ of chat history into skills, rules, and context.
 
 ## Rules for agents
 
-1. After a non-trivial task, append a short session-log entry
-2. If you discovered a **repeatable** procedure, create or patch a skill (see `/agent/skills/skill-authoring/SKILL.md`)
-3. If you discovered a **constraint**, patch the relevant rule — and remove wording it replaces
-4. Prefer appending files during the session; assume the next chat reloads updated kit files
-5. Never put secrets in memory, skills, or context
-6. Use `/agent/handoff.md` when transferring work to a new chat
+1. **Every answer** must already reflect loaded skills + rules (AGENTS.md §2). If you notice a miss, fix the reply before finishing.
+2. After a non-trivial task, append a short session-log entry
+3. If you discovered a **repeatable** procedure, create or patch a skill (see `/agent/skills/skill-authoring/SKILL.md`)
+4. If you discovered a **constraint**, patch the relevant rule — and remove wording it replaces
+5. Prefer appending files during the session; assume the next chat reloads updated kit files — that is how answers keep getting better
+6. Never put secrets in memory, skills, or context
+7. Use `/agent/handoff.md` when transferring work to a new chat
 
 ## Promote from memory (humans + agents)
 

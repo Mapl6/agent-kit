@@ -4,7 +4,8 @@ Hermes-inspired map so agents do not dump everything into one file.
 
 | File | Role | Who writes | Hot every session? |
 |---|---|---|---|
-| `AGENTS.md` | Root operating procedure: read `/agent/` files in order, then work step by step | Humans + kit | Yes |
+| `AGENTS.md` | Root operating procedure + bootstrap prompt pointer | Humans + kit | Yes |
+| `/agent/bootstrap-prompt.md` | Copy-paste prompt to fill kit from the real project (first chat) | Humans paste into agent | First setup |
 | `AGENTS.override.md` | Personal overrides (gitignored) | You | If present |
 | `SOUL.md` | Persona / voice (gitignored) | You | If present |
 | `/agent/rules/*` | Always/never constraints | Humans + agents | Yes (relevant) |

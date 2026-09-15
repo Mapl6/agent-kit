@@ -1,6 +1,6 @@
 {
   "name": "@mapl6/agent-kit",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Give Cursor, Claude Code, and Copilot a real project brain. Scans your repo and scaffolds AGENTS.md, skills, rules, docs, and memory.",
   "author": "Mapl6 <mahdi.am6@gmail.com>",
   "license": "MIT",

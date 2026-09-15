@@ -13,8 +13,9 @@ npx @mapl6/agent-kit add-skill my-flow
 
 ## Layout
 
-- **`AGENTS.md`** — root operating procedure (read `/agent/` files in order, then work)
-- **`/agent/skills/<name>/SKILL.md`** — playbooks
+- **`AGENTS.md`** — root operating procedure + first-time bootstrap prompt
+- **`/agent/bootstrap-prompt.md`** — copy-paste into your agent to fill the kit from the real project
+- **`/agent/skills/<name>/SKILL.md`** — playbooks (use on every matching task)
 - **`/agent/memory/`** — hot facts, user prefs, session log
 - **`improvement.md` / `handoff.md`** — learn and transfer
 - **`docs/file-roles.md`** — which file does what

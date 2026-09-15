@@ -9,7 +9,7 @@ const { scanProject, applyScanToKit, fillAllTokens } = require("./lib/scan-proje
 const PKG = require("../package.json");
 const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
 const TARGET_DIR = process.cwd();
-const KIT_VERSION = PKG.version || "1.4.0";
+const KIT_VERSION = PKG.version || "1.5.0";
 
 const SKILL_STUB = `---
 name: {{NAME}}
@@ -322,10 +322,12 @@ async function cmdInit({ force, yes, noScan }) {
   }
 
   console.log("Next steps:");
-  console.log("  1. Review AGENTS.md and agent/docs (generated blocks are marked)");
-  console.log("  2. Fill remaining [bracketed placeholders]");
-  console.log("  3. Commit — then re-run: npx @mapl6/agent-kit scan after stack changes");
-  console.log("  4. Grow skills via /agent/improvement.md or: npx @mapl6/agent-kit add-skill <name>\n");
+  console.log("  1. Open a NEW chat in Cursor / Claude / Copilot in THIS repo");
+  console.log("  2. Paste the prompt from: agent/bootstrap-prompt.md");
+  console.log("     (also printed at the top of AGENTS.md §0)");
+  console.log("  3. Let the agent fill /agent docs, rules, memory from your real project");
+  console.log("  4. Review + commit — later answers should use skills + rules every time");
+  console.log("  5. After stack changes: npx @mapl6/agent-kit scan\n");
 }
 
 async function cmdEnhance({ force }) {
@@ -366,6 +368,7 @@ function cmdDoctor({ reportOnly }) {
   const required = [
     "AGENTS.md",
     path.join("agent", "improvement.md"),
+    path.join("agent", "bootstrap-prompt.md"),
     path.join("agent", "handoff.md"),
     path.join("agent", "commands.md"),
     path.join("agent", "skills", "AGENTS.md"),
