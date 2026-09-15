@@ -1,0 +1,15 @@
+# AGENTS.override.md (example)
+
+Personal overrides on top of committed `AGENTS.md`. Copy to `AGENTS.override.md`
+at the repo root and keep it gitignored (scan adds the ignore rule).
+
+Use for machine-specific ports, private checklist tweaks, or stricter personal rules.
+Agents: if `AGENTS.override.md` exists, treat it as higher priority for this developer only.
+
+```markdown
+# My overrides
+
+- Local app URL: http://localhost:3001
+- Always run typecheck before claiming done
+- Never commit lockfile changes unless I ask
+```

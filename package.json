@@ -1,0 +1,29 @@
+{
+  "name": "create-agent-kit",
+  "version": "1.2.0",
+  "description": "Frontend-first AGENTS.md kit: scan your repo to fill skills/rules/docs/memory, Hermes-inspired self-improvement, works with Claude Code, Cursor, Copilot, and more.",
+  "bin": {
+    "create-agent-kit": "bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "templates"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "agents.md",
+    "frontend",
+    "skills",
+    "cursor",
+    "claude",
+    "copilot",
+    "scaffold",
+    "self-improving",
+    "scan"
+  ],
+  "license": "MIT"
+}

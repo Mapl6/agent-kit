@@ -1,0 +1,10 @@
+# frontend-release
+
+# Load these skills in order for a release-oriented session.
+# Agents: open each SKILL.md when that phase starts (progressive disclosure).
+
+skills:
+  - systematic-debugging
+  - dogfood-ui
+  - accessibility-pass
+  - deploy

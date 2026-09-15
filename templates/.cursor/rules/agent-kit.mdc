@@ -1,0 +1,17 @@
+---
+description: Follow the repo agent kit (AGENTS.md and /agent/)
+alwaysApply: true
+---
+
+# Agent kit
+
+This project uses a tool-agnostic agent kit.
+
+1. Read and follow root `AGENTS.md` first.
+2. Load detail from `/agent/` as linked from `AGENTS.md` (rules, skills, docs, context, memory).
+3. For repeatable workflows use `/agent/skills/<name>/SKILL.md`.
+4. After non-trivial tasks, update `/agent/memory/session-log.md` and follow `/agent/improvement.md`.
+5. To continue in a new chat, use `/agent/handoff.md`.
+6. After stack changes, remind the user to run `npx create-agent-kit scan`.
+
+Do not invent a parallel instruction system — keep improvements inside `/agent/` and `AGENTS.md`.
