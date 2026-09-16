@@ -1,0 +1,52 @@
+{
+  "name": "@mapl6/agent-kit",
+  "version": "2.0.0",
+  "description": "Give Cursor, Claude Code, and Copilot a real project brain. Local-first index, reports, and agent onboarding.",
+  "type": "module",
+  "author": "Mapl6 <mahdi.am6@gmail.com>",
+  "license": "MIT",
+  "bin": {
+    "agent-kit": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "templates",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mapl6/agent-kit-core": "2.0.0",
+    "commander": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mapl6/agent-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Mapl6/agent-kit/issues"
+  },
+  "homepage": "https://github.com/Mapl6/agent-kit#readme",
+  "keywords": [
+    "agents.md",
+    "ai-agents",
+    "cursor",
+    "claude-code",
+    "github-copilot",
+    "cli",
+    "llm",
+    "developer-tools",
+    "project-index"
+  ]
+}

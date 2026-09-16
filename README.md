@@ -1,123 +1,123 @@
 # Agent Kit
 
-**One command to give Cursor, Claude Code, Copilot, Aider, and Cline a real project brain.**
+**Local-first project index and reports for Cursor, Claude Code, Copilot, and other agents.**
 
-Most `AGENTS.md` files are empty templates. Agent Kit **scans your frontend repo** and fills skills, rules, architecture, and memory from your actual stack.
+`@mapl6/agent-kit` scans a repository safely, stores a reviewable snapshot under `.agent-kit/`, and exports Markdown/JSON plus a copy-paste onboarding prompt. It does **not** call external LLM APIs and does **not** execute project lifecycle scripts while indexing.
+
+Development status and upcoming features: [PROGRESS.md](./PROGRESS.md).
 
 [![npm](https://img.shields.io/npm/v/@mapl6/agent-kit.svg)](https://www.npmjs.com/package/@mapl6/agent-kit)
-[![downloads](https://img.shields.io/npm/dw/@mapl6/agent-kit.svg)](https://www.npmjs.com/package/@mapl6/agent-kit)
 [![license](https://img.shields.io/npm/l/@mapl6/agent-kit.svg)](./LICENSE)
-[![stars](https://img.shields.io/github/stars/Mapl6/agent-kit?style=social)](https://github.com/Mapl6/agent-kit)
 
 ```bash
-npx @mapl6/agent-kit
+npx @mapl6/agent-kit init
 ```
 
-Works with any agent that reads Markdown. Plain files + a CLI — not another runtime.
+## Installation
 
-## Why this exists
+```bash
+# one-shot
+npx @mapl6/agent-kit init
 
-AI coding agents are only as good as the repo they land in. Without a kit they guess your stack, invent folder names, and skip tests.
+# or install locally
+npm install -D @mapl6/agent-kit
+npx agent-kit init
+```
 
-Agent Kit drops in an `AGENTS.md` that already knows your app:
+Requires Node.js **18+**.
 
-| Detects | Writes |
+## CLI usage
+
+| Command | Description |
 |---|---|
-| Next.js, Vite, Remix, and friends | `AGENTS.md` + Cursor / Claude / Copilot pointers |
-| `app/` vs `src/` routing | `agent/docs/architecture.md` + `ui-architecture.md` |
-| npm / pnpm / yarn / bun | `agent/commands.md` |
-| ESLint, Prettier, Vitest, Playwright | `agent/rules/*` |
-| Your real scripts | `agent/memory/MEMORY.md` |
+| `agent-kit init [--path .] [--skip-index] [--force]` | Create `.agent-kit/config.json` and (unless skipped) first index |
+| `agent-kit index [--path .]` | Build or refresh `snapshot.json` (incremental) |
+| `agent-kit status [--path .]` | Show init/index state |
+| `agent-kit report [--path .] [--format both\|markdown\|json]` | Write reports under `.agent-kit/reports/` |
 
-Generated blocks are wrapped in HTML comments. Your own notes stay intact when you re-scan.
-
-## Quick start
+Examples:
 
 ```bash
-cd your-frontend-app
-npx @mapl6/agent-kit
+npx @mapl6/agent-kit init
+npx @mapl6/agent-kit index
+npx @mapl6/agent-kit status
+npx @mapl6/agent-kit report --format markdown
 ```
 
-**First chat (required):** open a new agent chat and paste the prompt from `agent/bootstrap-prompt.md` (also at the top of `AGENTS.md`). That fills docs, rules, and memory from your **real** project.
-
-After that, every task: the agent reads `/agent/` files in order, follows a skill, applies rules, and improves the answer before finishing.
-
-Stack changed later?
-
-```bash
-npx @mapl6/agent-kit scan
-```
-
-## Commands
-
-| Command | What it does |
-|---|---|
-| `init` (default) | Scaffold the kit, then scan the project |
-| `scan` | Re-read the repo and refresh generated sections |
-| `enhance` | Add any missing kit files, then scan |
-| `add-skill <name>` | Scaffold `agent/skills/<name>/SKILL.md` |
-| `doctor` | Health check + scan summary |
-
-```bash
-npx @mapl6/agent-kit --yes          # skip prompts
-npx @mapl6/agent-kit scan --report  # print detection JSON
-npx @mapl6/agent-kit doctor
-npx @mapl6/agent-kit add-skill checkout-flow
-```
-
-## What you get
+## What gets written
 
 ```text
-AGENTS.md                 ← root operating procedure (read /agent files in order)
-CLAUDE.md / .cursorrules  ← vendor pointers back to AGENTS.md
-.agent-kit.json           ← version + last scan
-agent/
-  skills/                 ← playbooks (setup, feature, a11y, debug, deploy…)
-  memory/                 ← MEMORY.md, USER.md, session-log.md
-  docs/                   ← architecture, UI, data, file roles
-  rules/                  ← coding, git, security, testing
-  context/                ← conventions, glossary, known issues
-  improvement.md          ← promote lessons over time
-  handoff.md              ← continue the same work in a new chat
+.agent-kit/
+  config.json
+  snapshot.json
+  reports/
+    latest.md
+    latest.json
+    onboarding-prompt.md
 ```
 
-## How the loop works
+Snapshots are metadata-first (paths, kinds, hashes, technology signals with evidence). Secret files (e.g. `.env`) and symlinks are never content-hashed or logged as contents.
 
-```mermaid
-flowchart LR
-  A[You ship a feature] --> B[Session log]
-  B --> C[MEMORY / skills / rules]
-  C --> D[Next chat starts smarter]
-  E[Stack changes] --> F["npx @mapl6/agent-kit scan"]
-  F --> C
+## Exit codes
+
+Stable codes for scripting:
+
+| Code | Meaning |
+|---|---|
+| 0 | Success |
+| 1 | Unexpected / general error |
+| 2 | Invalid input or project state |
+| 3 | Permission denied |
+| 4 | Storage write failure |
+| 5 | Index failure |
+
+Errors print as:
+
+```text
+Error: PROJECT_NOT_FOUND
+The specified project root does not exist.
+Suggested action:
+  Check the path and run the command again.
 ```
 
-1. Agents read root `AGENTS.md`, then the `/agent/` files it lists, **in order**.
-2. After real work, they append `agent/memory/session-log.md`.
-3. Durable facts move into `MEMORY.md`, a new skill, or a rule.
-4. Re-scan when you add Next, Playwright, a new package manager, and so on.
+## Safety guarantees (Phase 1)
 
-## Works with
+- Project root validation (must be a real directory, not a symlink)
+- Symlinks skipped during discovery
+- Secret path patterns ignored for content hashing
+- Max file size for hashed content
+- `package.json` is read as JSON only (no install / no lifecycle scripts)
+- No automatic network/API uploads
 
-Cursor · Claude Code · GitHub Copilot · Aider · Cline · any Markdown-reading agent
+## Monorepo layout
 
-Inspired by Hermes-style agent patterns (skills, memory budgets, learn loop) — ported to **plain Markdown**, not a Hermes runtime.
-
-## FAQ
-
-**Will it overwrite my files?**  
-If `AGENTS.md` already exists at the project root, the kit is **appended at the end** (a short pointer is added at the top). Other kit files are skipped if they already exist (`--force` overwrites). Generated `<!-- agent-kit:generated:* -->` blocks can be re-scanned without wiping your prose.
-
-**Frontend only?**  
-It is frontend-first (Next, Vite, routing, a11y, UI QA). It still works in other Node repos; detection will just be thinner.
-
-**Do I need an account?**  
-No. `npx @mapl6/agent-kit` is enough.
-
-## Star & share
-
-If this saves you a setup hour, [star the repo](https://github.com/Mapl6/agent-kit) so other frontend teams can find it. Issues and PRs are welcome.
+| Package | npm name | Role |
+|---|---|---|
+| `packages/cli` | `@mapl6/agent-kit` | Published CLI (`agent-kit`) |
+| `packages/core` | `@mapl6/agent-kit-core` | Domain, storage, indexer, reports |
 
 ```bash
-npx @mapl6/agent-kit
+npm install
+npm run build
+npm test
+npm run typecheck
 ```
+
+## Publishing note
+
+Workspace development may use linked package versions. Before a public release, publish `@mapl6/agent-kit-core` then `@mapl6/agent-kit`, and verify with:
+
+```bash
+npm pack -w @mapl6/agent-kit-core
+npm pack -w @mapl6/agent-kit
+mkdir /tmp/agent-kit-install && cd /tmp/agent-kit-install
+npm init -y
+npm install /path/to/mapl6-agent-kit-core-*.tgz /path/to/mapl6-agent-kit-*.tgz
+npx agent-kit init
+npx agent-kit index
+npx agent-kit init   # should not wipe data; expect ALREADY_INITIALIZED
+```
+
+## Version 2 notes
+
+v2 is a ground-up modular core + Commander CLI. A **lean** Markdown kit for a later scaffold/export phase lives only under `packages/cli/templates` (single copy — no root `templates/` duplicate). Phase 1 default path is `init` / `index` / `status` / `report`.

@@ -6,14 +6,17 @@ on:
   pull_request:
 
 jobs:
-  smoke:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - name: CLI help
-        run: node bin/cli.js --help
-      - name: Package is valid
-        run: npm pack --dry-run
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm pack -w @mapl6/agent-kit-core --dry-run
+      - run: npm pack -w @mapl6/agent-kit --dry-run
