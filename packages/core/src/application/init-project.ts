@@ -119,6 +119,7 @@ export async function initProject(options: InitOptions, deps: InitDeps): Promise
     agents: config.agents as AgentId[],
     explicit,
     dryRun,
+    approvedSkills: config.approvedSkills,
     now: deps.now?.(),
   });
 

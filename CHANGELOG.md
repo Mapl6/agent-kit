@@ -2,6 +2,25 @@
 
 `@mapl6/agent-kit` and `@mapl6/agent-kit-core` are released together with the same version.
 
+## 3.2.0 — 2026-10-03
+
+Roadmap phase 4: rules, skills and conflict detection.
+
+### Added
+
+- **Rules** in `.agent-kit/rules/<id>.md` with a `description` and optional `paths` globs. Rules without paths are added to the shared `AGENTS.md` context. Rules with paths are translated to `.claude/rules/agent-kit/` (`paths`), `.cursor/rules/agent-kit/*.mdc` (`globs`) and `.github/instructions/agent-kit/` (`applyTo`), plus an `AGENTS.md` index for Codex. Brace groups are expanded for the comma-separated formats.
+- **Skills** in `.agent-kit/skills/<name>/` ([Agent Skills](https://agentskills.io) format, validated), copied to `.agents/skills/` (Codex, Cursor, Copilot) and `.claude/skills/` (Claude Code).
+- Skills with executable files are held back until `agent-kit skills approve <name>`. Approval is tied to a content hash, and copies are never made executable.
+- `agent-kit rules`, `rules new`, `skills`, `skills new`, `skills approve`.
+- `agent-kit conflicts [--json] [--ci]`: instructions that contradict the repo's tools or each other, with file and line. `init` and `sync` mention them.
+
+### Changed
+
+- Generated files are owned by content hash: a hand-edited copy, or a same-named file Agent Kit didn't create, is reported as CONFLICT and left alone.
+- `uninstall` keeps `.agent-kit/rules/` and `.agent-kit/skills/` and removes only Agent Kit's own data; emptied directories are pruned.
+- Backups keep the 10 newest sets.
+- Agent config inside fixture trees (`fixtures/`, `__fixtures__/`, `testdata/`) no longer counts as the project's own.
+
 ## 3.1.0 — 2026-10-03
 
 Roadmap phase 3: Agent Kit now sets up your coding agents.

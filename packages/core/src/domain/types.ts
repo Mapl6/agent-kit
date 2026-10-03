@@ -67,6 +67,8 @@ export type ProjectConfig = {
   followSymlinks: false;
   /** Enabled agent adapters (see `agent-kit agents`). Absent until first install. */
   agents?: string[];
+  /** Skills with scripts approved for distribution: name → content hash at approval time. */
+  approvedSkills?: Record<string, string>;
 };
 
 export type ProjectSnapshot = {

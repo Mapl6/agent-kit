@@ -1,7 +1,8 @@
 import type { Evidence } from "../domain/types.js";
 import { AppError } from "../errors/AppError.js";
 import type { ProjectModel } from "../intelligence/types.js";
-import { AGENT_IDS, type AgentAdapter, type AgentId } from "./types.js";
+import { claudeRule, copilotRule, cursorRule, skillFiles } from "./rule-files.js";
+import { AGENT_IDS, type AgentAdapter, type AgentId, type AdapterTarget } from "./types.js";
 
 const VERIFIED = "2026-10-03";
 
@@ -21,8 +22,18 @@ const agentsMd: AgentAdapter = {
   docs: ["https://agents.md"],
   verifiedAt: VERIFIED,
   detect: evidenceFor(["agents-md"]),
-  async targets({ context }) {
-    return [{ adapter: "agents-md", path: "AGENTS.md", body: context, createIfMissing: true }];
+  async targets({ context, skills }) {
+    // .agents/skills is read by Codex, Cursor and Copilot.
+    return [
+      {
+        kind: "block",
+        adapter: "agents-md",
+        path: "AGENTS.md",
+        body: context,
+        createIfMissing: true,
+      },
+      ...skills.flatMap((s) => skillFiles("agents-md", ".agents/skills", s)),
+    ];
   },
 };
 
@@ -47,40 +58,34 @@ const claudeCode: AgentAdapter = {
   docs: ["https://code.claude.com/docs/en/memory"],
   verifiedAt: VERIFIED,
   detect: evidenceFor(["claude-md", "claude-dir"]),
-  async targets({ files, explicit }) {
+  async targets({ files, explicit, rules, skills }) {
+    // Path rules and skills: Claude Code reads only .claude/rules and .claude/skills.
+    const own: AdapterTarget[] = [
+      ...rules.filter((r) => r.paths.length > 0).map(claudeRule),
+      ...skills.flatMap((s) => skillFiles("claude-code", ".claude/skills", s)),
+    ];
     const skipWhen = (outside: string) =>
       IMPORTS_AGENTS_MD.test(outside) ? "already imports AGENTS.md" : null;
-    if (await files.isFile("CLAUDE.md")) {
-      return [
-        {
-          adapter: "claude-code",
-          path: "CLAUDE.md",
-          body: "@AGENTS.md",
-          createIfMissing: false,
-          skipWhen,
-        },
-      ];
-    }
+    const block = (path: string, body: string, createIfMissing: boolean): AdapterTarget => ({
+      kind: "block",
+      adapter: "claude-code",
+      path,
+      body,
+      createIfMissing,
+      ...(createIfMissing ? {} : { skipWhen }),
+    });
+
+    if (await files.isFile("CLAUDE.md")) return [block("CLAUDE.md", "@AGENTS.md", false), ...own];
     if (await files.isFile(".claude/CLAUDE.md")) {
-      return [
-        {
-          adapter: "claude-code",
-          path: ".claude/CLAUDE.md",
-          body: "@../AGENTS.md",
-          createIfMissing: false,
-          skipWhen,
-        },
-      ];
+      return [block(".claude/CLAUDE.md", "@../AGENTS.md", false), ...own];
     }
     // A personal CLAUDE.local.md also stops Claude reading AGENTS.md; don't edit
     // the personal file, add a shared CLAUDE.md instead. Same when asked explicitly,
     // which also covers Claude Code versions without native AGENTS.md support.
     if (explicit || (await files.isFile("CLAUDE.local.md"))) {
-      return [
-        { adapter: "claude-code", path: "CLAUDE.md", body: "@AGENTS.md", createIfMissing: true },
-      ];
+      return [block("CLAUDE.md", "@AGENTS.md", true), ...own];
     }
-    return [];
+    return own;
   },
 };
 
@@ -96,12 +101,13 @@ const cursor: AgentAdapter = {
     pathScopedRules: "yes",
   },
   notes:
-    "Reads AGENTS.md in the root and subdirectories. .cursor/rules (.mdc) are reserved for path rules.",
+    "Reads AGENTS.md and .agents/skills natively; path rules go to .cursor/rules/agent-kit/*.mdc.",
   docs: ["https://cursor.com/docs/context/rules"],
   verifiedAt: VERIFIED,
   detect: evidenceFor(["cursor-dir", "cursorrules"]),
-  async targets() {
-    return [];
+  async targets({ rules }) {
+    // AGENTS.md and .agents/skills are read natively; only path rules need translating.
+    return rules.filter((r) => r.paths.length > 0).map(cursorRule);
   },
 };
 
@@ -148,14 +154,17 @@ const copilot: AgentAdapter = {
   ],
   verifiedAt: VERIFIED,
   detect: evidenceFor(["copilot-instructions"]),
-  async targets({ context }) {
+  async targets({ context, rules }) {
+    // Skills: Copilot reads .agents/skills, written by the AGENTS.md adapter.
     return [
       {
+        kind: "block",
         adapter: "copilot",
         path: ".github/copilot-instructions.md",
         body: context,
         createIfMissing: true,
       },
+      ...rules.filter((r) => r.paths.length > 0).map(copilotRule),
     ];
   },
 };

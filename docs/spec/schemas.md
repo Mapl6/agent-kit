@@ -135,10 +135,38 @@ The npm placeholder test script (`echo "Error: no test specified"`) is ignored.
 ## Config v1 (`.agent-kit/config.json`)
 
 `schemaVersion`, `projectRoot`, `createdAt`, `updatedAt`, `ignoreGlobs`,
-`maxFileBytes`, `followSymlinks: false`, and (3.1+) `agents?: string[]`: the
-enabled adapters. An empty list means `--no-agents`. `projectRoot` is ignored
+`maxFileBytes`, `followSymlinks: false`, (3.1+) `agents?: string[]`: the
+enabled adapters, and (3.2+) `approvedSkills?: Record<name, sha256>`. An empty list means `--no-agents`. `projectRoot` is ignored
 when reading; the resolved `--path` wins, so a committed `.agent-kit/` works on
 any machine.
+
+## Rule (`.agent-kit/rules/<id>.md`, developer-owned)
+
+```markdown
+---
+description: How to write tests
+paths:
+  - "src/**/*.test.{ts,tsx}"
+---
+
+- One expectation per line.
+```
+
+`description` is required (one line). `paths` is optional: relative globs, no
+`..` or absolute paths. Omit it to apply the rule everywhere. It may also be an
+inline list or a comma-separated string; commas inside `{…}` don't split.
+`<id>` is lowercase and hyphenated (≤ 64 chars). The file is ≤ 64 KiB with a
+non-empty body.
+
+## Skill (`.agent-kit/skills/<name>/`, developer-owned)
+
+[Agent Skills](https://agentskills.io/specification) format: `SKILL.md` with
+`name` (must equal the directory, lowercase, single hyphens, ≤ 64) and
+`description` (1–1024 chars), plus any files (`scripts/`, `references/`,
+`assets/`). No symlinks, ≤ 200 files, each ≤ 1 MiB. Files under `scripts/` or
+with executable extensions (`.sh .py .js .ts .rb .ps1 …`) mark the skill as
+executable. It's then installed only while `config.approvedSkills[name]`
+equals the hash of all its files.
 
 ## Install manifest (`.agent-kit/state/install.json`)
 
@@ -149,8 +177,10 @@ type InstallManifest = {
     string /* repo-relative path */,
     {
       adapter: "agents-md" | "claude-code" | "cursor" | "codex" | "copilot";
+      kind?: "block" | "file"; // block: managed section; file: whole generated file (absent = block)
       created: boolean; // Agent Kit created the file → uninstall may delete it
       separator: string; // text inserted before an appended block → stripped on removal
+      hash?: string; // kind "file": sha256 Agent Kit wrote; a mismatch means "edited by hand" → conflict
     }
   >;
 };

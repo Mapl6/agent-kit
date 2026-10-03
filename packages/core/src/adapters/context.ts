@@ -1,5 +1,6 @@
 import type { Detection } from "../domain/types.js";
 import type { DirectoryRole, ProjectCommand, ProjectModel } from "../intelligence/types.js";
+import type { Rule } from "../rules/rules.js";
 
 const ROLE_TEXT: Partial<Record<DirectoryRole, string>> = {
   routes: "routes (file-based routing)",
@@ -55,7 +56,27 @@ function commandCell(c: ProjectCommand): string {
  * The project context every adapter shares. Deterministic and concise: agents
  * load it on every session, so it carries only what changes their behaviour.
  */
-export function renderProjectContext(model: ProjectModel): string {
+/** Nest a rule body under the block's headings: drop a leading title that repeats the description, demote the rest. */
+function ruleBody(rule: Rule): string {
+  const lines = rule.body.split("\n");
+  const first = lines[0]?.replace(/^#+\s*/, "").trim();
+  if (/^#\s/.test(lines[0] ?? "") && first?.toLowerCase() === rule.description.toLowerCase()) {
+    lines.shift();
+    while (lines[0]?.trim() === "") lines.shift();
+  }
+  let fence = false;
+  return lines
+    .map((line) => {
+      if (/^(```|~~~)/.test(line)) fence = !fence;
+      if (fence) return line;
+      const m = /^(#{1,6})\s/.exec(line);
+      return m ? "#".repeat(Math.min(6, m[1]!.length + 4)) + line.slice(m[1]!.length) : line;
+    })
+    .join("\n")
+    .trim();
+}
+
+export function renderProjectContext(model: ProjectModel, rules: readonly Rule[] = []): string {
   const out: string[] = [];
   const d = model.detections;
   const monorepo = model.project.monorepo;
@@ -162,6 +183,28 @@ export function renderProjectContext(model: ProjectModel): string {
     for (const dir of dirs) {
       const likely = dir.confidence === "high" ? "" : " (likely)";
       out.push(`- ${safeCode(`${dir.path}/`)}: ${ROLE_TEXT[dir.role]}${likely}`);
+    }
+    out.push("");
+  }
+
+  // Rules are written by the project's developers as instructions for agents, so
+  // they're included as written (unlike repo-derived names above).
+  const always = rules.filter((r) => r.paths.length === 0);
+  const scoped = rules.filter((r) => r.paths.length > 0);
+  if (always.length > 0) {
+    out.push("### Rules", "");
+    for (const rule of always) out.push(`#### ${rule.description}`, "", ruleBody(rule), "");
+  }
+  if (scoped.length > 0) {
+    out.push(
+      "### Rules for specific files",
+      "",
+      "Before changing files that match a pattern below, read that rule:",
+      "",
+    );
+    for (const rule of scoped) {
+      const globs = rule.paths.map((p) => code(p)).join(", ");
+      out.push(`- ${rule.description}: ${globs}. See ${code(rule.source)}.`);
     }
     out.push("");
   }

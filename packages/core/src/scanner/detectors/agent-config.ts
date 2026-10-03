@@ -47,6 +47,9 @@ const SPECS: ConfigSpec[] = [
   },
 ];
 
+/** Test-fixture trees hold other projects' files, not this project's agent config. */
+const FIXTURE_DIRS = new Set(["fixtures", "__fixtures__", "testdata"]);
+
 function formatBytes(n: number): string {
   if (n < 1024) return `${n} B`;
   return `${(n / 1024).toFixed(1)} KB`;
@@ -65,7 +68,11 @@ function collect(ctx: ScanContext, spec: ConfigSpec): Evidence[] {
   for (const f of spec.files ?? []) addFile(f);
   if (spec.anyDepth) {
     const matches = ctx.files
-      .filter((f) => path.posix.basename(f.relativePath) === spec.anyDepth)
+      .filter(
+        (f) =>
+          path.posix.basename(f.relativePath) === spec.anyDepth &&
+          !f.relativePath.split("/").some((seg) => FIXTURE_DIRS.has(seg)),
+      )
       .map((f) => f.relativePath)
       .sort((a, b) => a.split("/").length - b.split("/").length || a.localeCompare(b));
     for (const p of matches) addFile(p);

@@ -11,7 +11,10 @@ npm-debug.log*
 .tmp-test/
 coverage/
 *.tsbuildinfo
-.agent-kit/
+# Agent Kit's own data; developer-authored rules and skills are committed.
+.agent-kit/*
+!.agent-kit/rules/
+!.agent-kit/skills/
 fixtures/**/.agent-kit/
 !fixtures/**/.env
 packages/*/README.md
