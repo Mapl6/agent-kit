@@ -5,7 +5,7 @@ describe("cli program", () => {
   it("registers core commands", () => {
     const program = createProgram();
     const names = program.commands.map((c) => c.name());
-    expect(names).toEqual(expect.arrayContaining(["scan", "init", "index", "status", "report"]));
+    expect(names).toEqual(expect.arrayContaining(["scan", "init", "index", "status"]));
   });
 
   it("defaults to the read-only scan command", () => {

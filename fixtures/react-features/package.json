@@ -1,0 +1,24 @@
+{
+  "name": "fixture-react-features",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "zustand": "5.0.0"
+  },
+  "devDependencies": {
+    "vite": "6.0.0",
+    "vitest": "3.0.0",
+    "typescript": "5.8.2",
+    "husky": "9.0.0",
+    "@commitlint/cli": "19.0.0",
+    "prettier": "3.5.3"
+  }
+}

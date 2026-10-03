@@ -6,17 +6,24 @@ on:
   pull_request:
 
 jobs:
-  build-test:
+  check:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["20", "22", "24"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node-version }}
           cache: npm
       - run: npm ci
       - run: npm run build
       - run: npm run typecheck
+      - run: npm run lint
       - run: npm test
-      - run: npm pack -w @mapl6/agent-kit-core --dry-run
-      - run: npm pack -w @mapl6/agent-kit --dry-run
+      - name: Verify packages
+        run: |
+          npm pack -w @mapl6/agent-kit-core --dry-run 2>&1 | tee core.txt
+          npm pack -w @mapl6/agent-kit --dry-run 2>&1 | tee cli.txt
+          grep -q "README.md" core.txt && grep -q "README.md" cli.txt

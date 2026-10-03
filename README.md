@@ -1,64 +1,141 @@
 # Agent Kit
 
-**Make any codebase easier for AI coding agents to understand, work in, verify and maintain.**
-
-Agent Kit is a local-first project intelligence layer that sits between your repository and the coding agent you already use (Cursor, Claude Code, Codex, Copilot, …). It is not another agent.
-
-It starts by **understanding the repository**. `agent-kit scan` reports languages, package managers, workspaces, frameworks, test runners, tooling, CI and existing AI-agent configuration, with evidence for every finding and a clear line between what was _detected_ and what was _inferred_. It's read-only, runs offline, and never executes project code.
-
-Roadmap and status: [PROGRESS.md](./PROGRESS.md) · Specs: [docs/spec/](./docs/spec/)
+**Make any codebase easier for AI coding agents to understand.**
 
 [![npm](https://img.shields.io/npm/v/@mapl6/agent-kit.svg)](https://www.npmjs.com/package/@mapl6/agent-kit)
-[![license](https://img.shields.io/npm/l/@mapl6/agent-kit.svg)](./LICENSE)
+[![CI](https://github.com/Mapl6/agent-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/Mapl6/agent-kit/actions/workflows/ci.yml)
+[![license](https://img.shields.io/npm/l/@mapl6/agent-kit.svg)](https://github.com/Mapl6/agent-kit/blob/main/LICENSE)
+
+Coding agents (Cursor, Claude Code, Codex, Copilot, …) start every session
+knowing nothing about your repository. They guess the package manager, run the
+wrong test command, put files in the wrong place and ignore conventions you
+already have.
+
+Agent Kit is a **local-first project intelligence layer** that sits between your
+repository and whichever agent you use. It is not another agent. It works out
+what your project is, how it's organised and how to build, test and check it,
+then records that as a reviewable, provider-neutral model.
 
 ```bash
-npx @mapl6/agent-kit          # same as: npx @mapl6/agent-kit scan
+npx @mapl6/agent-kit
 ```
 
+Read-only. Offline. Never executes your code. Done in milliseconds.
+
+## What you get
+
 ```text
-Agent Kit scan: /work/shop
-412 files (content skipped: 1 secret)
+$ npx @mapl6/agent-kit
+Agent Kit scan: ~/code/shop
+28 files
 
 Languages
-  ✓ TypeScript               high    tsconfig.json; 188 .ts/.tsx/.mts/.cts files
+  ✓ TypeScript  high    tsconfig.json; 19 .ts/.tsx/.mts/.cts files
 
 Package manager
-  ✓ pnpm                     high    packageManager pnpm@9.15.0; pnpm-lock.yaml
+  ✓ Yarn        high    yarn.lock
 
 Frameworks
-  ✓ Next.js                  high    dep next; next.config.ts  [apps/web]
-  ✓ React                    high    dep react  [apps/web]
+  ✓ React       high    dep react
+  ✓ Vite        high    dep vite
 
-AI agent configuration
-  ✓ AGENTS.md                high    AGENTS.md (2.1 KB)
-  ✓ .cursor/                 high    .cursor/ (3 files)
-...
+Testing
+  ✓ Vitest      high    dep vitest
+
+Tooling
+  ✓ Prettier    high    dep prettier
+  ✓ Husky       high    dep husky; .husky/
+
+Not detected: Workspaces, CI/CD, AI agent configuration
+
+Commands
+  ✓ install    yarn install
+  ✓ dev        yarn run dev
+  ✓ build      yarn run build
+  ~ test       yarn vitest run
+  ✓ typecheck  yarn run typecheck
+
+Structure
+  ~ src/components/  ui-components       high
+  ~ src/features/    feature-modules     high
+  ~ src/hooks/       hooks               high
+  ~ src/services/    services-api        medium
+
+Architecture
+  ~ Shared UI layer           high
+  ~ Feature-oriented modules  high
+
+Test files
+  4 test files, colocated; *.test.tsx (3), *.test.ts (1)
+
 ✓ detected from files   ~ inferred (no direct evidence)   Nothing was written.
 ```
 
-Requires Node.js **18+**.
+Every line has **evidence** and a **confidence** level, and says whether it was
+**detected** from a file (`✓`) or **inferred** (`~`). Agent Kit never presents a
+guess as a fact.
+
+## What it understands
+
+| Area             | Covered                                                                                                                                |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Languages        | TypeScript, JavaScript, Python, Go, Rust, Java, Kotlin, C#, PHP, Ruby, Swift (by source files)                                         |
+| Package managers | npm, pnpm, Yarn, Bun, with a warning when lockfiles disagree                                                                           |
+| Monorepos        | npm / Yarn / pnpm workspaces, each package analysed separately                                                                         |
+| Frameworks       | React, Next.js, Vite, Vue, Nuxt, Angular, Svelte, SvelteKit, Astro, Remix, Express, NestJS                                             |
+| Testing          | Vitest, Jest, Playwright, Cypress; test file patterns; colocated vs separate tests                                                     |
+| Tooling          | ESLint, Prettier, Biome, Storybook, Husky, lint-staged, commitlint                                                                     |
+| Commands         | install, dev, build, start, test, e2e, lint, typecheck, format, per package                                                            |
+| Structure        | the role of each directory (routes, components, features, hooks, services, state, tests, …) and architecture patterns                  |
+| Repository       | Git, GitHub Actions, GitLab CI, CircleCI, git hooks, PR template, CODEOWNERS                                                           |
+| AI agent config  | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/`, `.cursorrules`, Copilot instructions, `.claude/`, `.agents/`, `.codex/`, MCP config |
 
 ## Commands
 
-| Command                                              | Writes                     | Description                                                                                         |
-| ---------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------- |
-| `agent-kit scan [--path .] [--json]`                 | nothing                    | **Default.** Analyze the repository. `--json` prints a stable [ScanResult](./docs/spec/schemas.md). |
-| `agent-kit init [--path .] [--skip-index] [--force]` | `.agent-kit/`              | Create config and the first index snapshot.                                                         |
-| `agent-kit index [--path .]`                         | `.agent-kit/snapshot.json` | Refresh the incremental file index.                                                                 |
-| `agent-kit status [--path .]`                        | nothing                    | Show init/index state.                                                                              |
-| `agent-kit report …`                                 | `.agent-kit/reports/`      | _Deprecated_. Use `scan`.                                                                           |
+| Command                        | Writes        | What it does                                                                                                     |
+| ------------------------------ | ------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `agent-kit` / `agent-kit scan` | nothing       | Analyse the repository and print detections plus the project model.                                              |
+| `agent-kit scan --json`        | nothing       | Raw detections as JSON ([`ScanResult`](https://github.com/Mapl6/agent-kit/blob/main/docs/spec/schemas.md)).      |
+| `agent-kit scan --model`       | nothing       | The project model as JSON ([`ProjectModel`](https://github.com/Mapl6/agent-kit/blob/main/docs/spec/schemas.md)). |
+| `agent-kit init [--dry-run]`   | `.agent-kit/` | Save config, an index snapshot and `.agent-kit/project.json`.                                                    |
+| `agent-kit index [--dry-run]`  | `.agent-kit/` | Refresh them. `project.json` is only rewritten when it changes.                                                  |
+| `agent-kit status`             | nothing       | Show what has been initialised and indexed.                                                                      |
 
-More commands (`doctor`, `verify`, `sync`, `handoff`, …) arrive phase by phase. See the [CLI spec](./docs/spec/cli.md).
+Every command takes `--path <dir>` (default: current directory). Commands that
+write support `--dry-run` and list each file as create / update / unchanged.
+
+`.agent-kit/project.json` is deterministic (no timestamps, no absolute paths),
+so you can commit it and review changes in pull requests.
 
 ## Safety
 
-- Read-only by default. A bare `agent-kit` never modifies your repo.
-- No project scripts, no subprocesses, no network.
-- Symlinks aren't followed or read, and a symlinked project root is rejected.
-- Secret files (`.env*`, keys, `.npmrc`, `secrets/`) are counted but never read, hashed or printed.
-- Repository files are treated as data. Instructions inside READMEs or `AGENTS.md` are never acted on; agent config files are reported by path and size only.
+- **Read-only by default.** Running `agent-kit` with no arguments never modifies your repository.
+- **Never executes project code.** No install scripts, no subprocesses (not even `git`), no network.
+- **Secrets stay secret.** `.env*`, private keys, `.npmrc` and `secrets/` are counted but never read, hashed or printed. `.git/` is never read.
+- **No symlink escapes.** Symlinks are not followed, and a symlinked project root is rejected.
+- **Repository content is data.** Instructions inside READMEs or `AGENTS.md` are never acted on. Agent config files are reported by path and size only.
 
-Details: [docs/spec/security.md](./docs/spec/security.md).
+Details: [security model](https://github.com/Mapl6/agent-kit/blob/main/docs/spec/security.md).
+
+## Use it from code
+
+```ts
+import { analyzeProject } from "@mapl6/agent-kit-core";
+
+const { scan, model } = await analyzeProject({ path: "." });
+const test = model.packages[0]?.commands.find((c) => c.task === "test");
+console.log(test?.command); // "yarn vitest run"
+```
+
+## Roadmap
+
+Understanding the repository (phases 0–2) is done. Next, Agent Kit uses the
+model to **generate native configuration for each agent** (Claude Code, Cursor,
+Codex, Copilot, plus a generic `AGENTS.md`), then adds rules and skills, a
+context budget, verification (`agent-kit verify`), safety policies, and memory
+and handoff between sessions.
+
+See the full [roadmap](https://github.com/Mapl6/agent-kit/blob/main/ROADMAP.md).
 
 ## Exit codes
 
@@ -71,19 +148,25 @@ Details: [docs/spec/security.md](./docs/spec/security.md).
 | 4    | Storage write failure          |
 | 5    | Index or scan failure          |
 
-## Development
+## Contributing
 
-| Package         | npm name                | Role                                 |
-| --------------- | ----------------------- | ------------------------------------ |
-| `packages/core` | `@mapl6/agent-kit-core` | Scanner, discovery, indexer, storage |
-| `packages/cli`  | `@mapl6/agent-kit`      | Published CLI (`agent-kit`)          |
+Requires Node.js 20+.
 
 ```bash
+git clone https://github.com/Mapl6/agent-kit.git && cd agent-kit
 npm install
-npm test                    # build + all tests
-UPDATE_GOLDEN=1 npm test    # refresh golden scan snapshots after an intended change
-npm run typecheck && npm run lint
+npm run check               # build + typecheck + lint + tests
+UPDATE_GOLDEN=1 npm test    # refresh golden snapshots after an intended change
 node packages/cli/dist/index.js --path fixtures/monorepo
 ```
 
-Core and CLI are released together at the same version. Publish `@mapl6/agent-kit-core` first, then `@mapl6/agent-kit`.
+| Package         | npm                                                                            | Role                                |
+| --------------- | ------------------------------------------------------------------------------ | ----------------------------------- |
+| `packages/cli`  | [`@mapl6/agent-kit`](https://www.npmjs.com/package/@mapl6/agent-kit)           | The `agent-kit` CLI                 |
+| `packages/core` | [`@mapl6/agent-kit-core`](https://www.npmjs.com/package/@mapl6/agent-kit-core) | Discovery, detectors, project model |
+
+Architecture and decisions: [docs/spec](https://github.com/Mapl6/agent-kit/tree/main/docs/spec), [docs/decisions](https://github.com/Mapl6/agent-kit/tree/main/docs/decisions). Release history: [CHANGELOG](https://github.com/Mapl6/agent-kit/blob/main/CHANGELOG.md).
+
+## License
+
+MIT

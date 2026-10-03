@@ -13,3 +13,6 @@ coverage/
 *.tsbuildinfo
 .agent-kit/
 fixtures/**/.agent-kit/
+!fixtures/**/.env
+packages/*/README.md
+packages/*/LICENSE

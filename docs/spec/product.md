@@ -47,5 +47,5 @@ How much corrective work does the developer do after the agent finishes?
 
 ## Roadmap
 
-See [PROGRESS.md](../../PROGRESS.md). Phases ship in order; each one is tested
+See [ROADMAP.md](../../ROADMAP.md). Phases ship in order; each one is tested
 and leaves the CLI usable before the next starts.

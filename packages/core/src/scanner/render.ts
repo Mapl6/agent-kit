@@ -31,6 +31,11 @@ function line(d: Detection, labelWidth: number): string {
 
 /** Human-readable scan output. Deterministic; no colour codes so it is safe to pipe. */
 export function renderScanText(result: ScanResult): string {
+  return [...renderScanSections(result), ...renderScanFooter(result.warnings)].join("\n");
+}
+
+/** Header plus one section per detection category. */
+export function renderScanSections(result: ScanResult): string[] {
   const out: string[] = [];
   const skippedTotal = Object.values(result.stats.skipped).reduce((a, b) => a + b, 0);
   const skippedDetail = Object.entries(result.stats.skipped)
@@ -44,18 +49,27 @@ export function renderScanText(result: ScanResult): string {
   );
 
   const labelWidth = Math.min(28, Math.max(10, ...result.detections.map((d) => d.label.length)));
+  const missing: string[] = [];
   for (const category of CATEGORY_ORDER) {
     const items = result.detections.filter((d) => d.category === category);
+    if (items.length === 0) {
+      missing.push(CATEGORY_TITLES[category]);
+      continue;
+    }
     out.push("", CATEGORY_TITLES[category]);
-    if (items.length === 0) out.push("  - none detected");
-    else for (const d of items) out.push(line(d, labelWidth));
+    for (const d of items) out.push(line(d, labelWidth));
   }
+  if (missing.length > 0) out.push("", `Not detected: ${missing.join(", ")}`);
 
-  if (result.warnings.length > 0) {
+  return out;
+}
+
+export function renderScanFooter(warnings: readonly string[]): string[] {
+  const out: string[] = [];
+  if (warnings.length > 0) {
     out.push("", "Warnings");
-    for (const w of result.warnings) out.push(`  ⚠ ${w}`);
+    for (const w of warnings) out.push(`  ⚠ ${w}`);
   }
-
   out.push("", "✓ detected from files   ~ inferred (no direct evidence)   Nothing was written.");
-  return out.join("\n");
+  return out;
 }

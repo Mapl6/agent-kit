@@ -13,6 +13,6 @@ export function snapshotPath(projectRoot: string): string {
   return path.join(agentKitDir(projectRoot), "snapshot.json");
 }
 
-export function reportsDir(projectRoot: string): string {
-  return path.join(agentKitDir(projectRoot), "reports");
+export function projectModelPath(projectRoot: string): string {
+  return path.join(agentKitDir(projectRoot), "project.json");
 }

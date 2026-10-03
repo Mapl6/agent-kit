@@ -1,16 +1,22 @@
 import type { IndexResult } from "../domain/types.js";
 import { AppError } from "../errors/AppError.js";
 import { resolveProjectRoot } from "../discovery/root-safety.js";
-import type { ConfigRepository, SnapshotRepository } from "../ports/repositories.js";
+import type {
+  ConfigRepository,
+  ProjectModelRepository,
+  SnapshotRepository,
+} from "../ports/repositories.js";
 import { buildProjectIndex } from "../indexer/orchestrate.js";
 
 export type IndexOptions = {
   path: string;
+  dryRun?: boolean;
 };
 
 export type IndexDeps = {
   configs: ConfigRepository;
   snapshots: SnapshotRepository;
+  models: ProjectModelRepository;
   now?: () => Date;
 };
 
@@ -26,5 +32,10 @@ export async function indexProject(options: IndexOptions, deps: IndexDeps): Prom
   }
 
   const config = await deps.configs.read(projectRoot);
-  return buildProjectIndex(config, { snapshots: deps.snapshots, now: deps.now });
+  return buildProjectIndex(config, {
+    snapshots: deps.snapshots,
+    models: deps.models,
+    now: deps.now,
+    dryRun: options.dryRun,
+  });
 }

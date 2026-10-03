@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "root": "<root>",
+  "stats": {
+    "files": 28,
+    "skipped": {}
+  },
+  "workspaces": [],
+  "detections": [
+    {
+      "id": "typescript",
+      "label": "TypeScript",
+      "category": "language",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "languages"
+      },
+      "evidence": [
+        {
+          "kind": "file",
+          "path": "tsconfig.json"
+        },
+        {
+          "kind": "file-count",
+          "detail": "19 .ts/.tsx/.mts/.cts files"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "nodejs",
+      "label": "Node.js",
+      "category": "runtime",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "node-runtime"
+      },
+      "evidence": [
+        {
+          "kind": "file",
+          "path": "package.json"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "yarn",
+      "label": "Yarn",
+      "category": "packageManager",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "package-manager"
+      },
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "path": "yarn.lock"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "react",
+      "label": "React",
+      "category": "framework",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "frameworks"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "react"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "vite",
+      "label": "Vite",
+      "category": "framework",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "frameworks"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "vite"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "vitest",
+      "label": "Vitest",
+      "category": "testing",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "testing"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "vitest"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "prettier",
+      "label": "Prettier",
+      "category": "tooling",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "tooling"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "prettier"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "husky",
+      "label": "Husky",
+      "category": "tooling",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "tooling"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "husky"
+        },
+        {
+          "kind": "directory",
+          "path": ".husky/"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "commitlint",
+      "label": "commitlint",
+      "category": "tooling",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "tooling"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "@commitlint/cli"
+        },
+        {
+          "kind": "file",
+          "path": "commitlint.config.js"
+        }
+      ],
+      "location": "."
+    }
+  ],
+  "warnings": []
+}

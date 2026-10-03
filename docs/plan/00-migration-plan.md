@@ -74,7 +74,7 @@ Short, decision-focused documents in `docs/spec/`:
 
 | Doc               | Content                                                                                                     |
 | ----------------- | ----------------------------------------------------------------------------------------------------------- |
-| `product.md`      | Condensed spec: positioning, principles, non-goals. Replaces the vision parts of `PROGRESS.md`.             |
+| `product.md`      | Condensed spec: positioning, principles, non-goals. Replaces the vision parts of `ROADMAP.md`.              |
 | `architecture.md` | Module boundaries above, data flow (scan → model → adapters), precedence rules (§53).                       |
 | `cli.md`          | Command list, which commands write, `--json`/`--ci`/`--dry-run` contract, exit codes.                       |
 | `schemas.md`      | `ScanResult` v1, `.agent-kit/` layout, config v2 + migration from v1.                                       |
@@ -180,10 +180,11 @@ etc. come after the JS set is trustworthy, as spec Phase 1 lists only JS/TS).
 
 1. "init is default" change dropped; `scan` is the read-only default ([ADR-002](../decisions/ADR-002-scan-is-default-and-read-only.md)).
 2. Single core package accepted ([ADR-001](../decisions/ADR-001-single-core-package.md)).
-3. `PROGRESS.md` kept as a short phase roadmap; product/architecture detail moved to `docs/spec/`.
+3. `ROADMAP.md` kept as a short phase roadmap; product/architecture detail moved to `docs/spec/`.
 
 ## 7. Deviations from this plan during implementation
 
 - `scan` doesn't read `.agent-kit/config.json` ignore globs yet; it uses defaults. Wiring them in is trivial once config v2 lands.
 - No `symlink-escape` fixture on disk; symlink cases are built at test time (git and npm pack handle committed symlinks inconsistently).
+- 3.0.0 cleanup: `report`, the reports module and the unused `cli/templates/` were removed instead of parked. They're recoverable from git history (commit `da94aa1` and earlier) if Phase 3–4 needs them.
 - Languages are detected by counting source files (any language), not inferred from `package.json`. A repo with only `package.json` reports Node.js but no language, which is accurate.

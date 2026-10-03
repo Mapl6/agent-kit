@@ -12,13 +12,14 @@
 
 ## Commands
 
-| Command                                     | Writes                                    | Status                                         |
-| ------------------------------------------- | ----------------------------------------- | ---------------------------------------------- |
-| `scan [--path .] [--json]`                  | nothing                                   | **default**, Phase 1                           |
-| `init [--path .] [--skip-index] [--force]`  | `.agent-kit/config.json`, `snapshot.json` | existing; will grow into setup in later phases |
-| `index [--path .]`                          | `.agent-kit/snapshot.json`                | existing                                       |
-| `status [--path .]`                         | nothing                                   | existing; becomes readiness view in Phase 9    |
-| `report [--path .] [--format …] [--stdout]` | `.agent-kit/reports/*`                    | **deprecated** → `scan`                        |
+| Command                                                | Writes                                                    | Notes                                                                                                                    |
+| ------------------------------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `scan [--path .] [--json \| --model]`                  | nothing                                                   | **Default.** Text: detections + project model. `--json`: ScanResult. `--model`: ProjectModel (what `index` would write). |
+| `init [--path .] [--skip-index] [--force] [--dry-run]` | `.agent-kit/config.json`, `snapshot.json`, `project.json` | Lists each file as create / update / unchanged.                                                                          |
+| `index [--path .] [--dry-run]`                         | `.agent-kit/snapshot.json`, `project.json`                | `project.json` is rewritten only when its content changes.                                                               |
+| `status [--path .]`                                    | nothing                                                   | Becomes the readiness view in Phase 9.                                                                                   |
+
+`report` was removed in 3.0.0. Use `scan`.
 
 Planned (not implemented): `doctor`, `enhance`, `sync`, `diff`, `verify`,
 `handoff`, `learn`, `agents`, `skills`, `rules`, `uninstall`, `onboard`, `explain`.

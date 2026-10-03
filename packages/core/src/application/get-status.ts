@@ -1,7 +1,11 @@
 import type { ProjectStatus } from "../domain/types.js";
 import { resolveProjectRoot } from "../discovery/root-safety.js";
-import type { ConfigRepository, SnapshotRepository } from "../ports/repositories.js";
-import { configPath, snapshotPath } from "../storage/paths.js";
+import type {
+  ConfigRepository,
+  ProjectModelRepository,
+  SnapshotRepository,
+} from "../ports/repositories.js";
+import { configPath, projectModelPath, snapshotPath } from "../storage/paths.js";
 
 export type StatusOptions = {
   path: string;
@@ -10,6 +14,7 @@ export type StatusOptions = {
 export type StatusDeps = {
   configs: ConfigRepository;
   snapshots: SnapshotRepository;
+  models: ProjectModelRepository;
 };
 
 export async function getProjectStatus(
@@ -25,6 +30,7 @@ export async function getProjectStatus(
       projectRoot,
       configPath: null,
       snapshotPath: null,
+      projectModelPath: null,
       lastIndexedAt: null,
       fileCount: 0,
       technologies: [],
@@ -37,6 +43,8 @@ export async function getProjectStatus(
     projectRoot,
     configPath: configPath(projectRoot),
     snapshotPath: snapshot ? snapshotPath(projectRoot) : null,
+    projectModelPath:
+      (await deps.models.readRaw(projectRoot)) !== null ? projectModelPath(projectRoot) : null,
     lastIndexedAt: snapshot?.updatedAt ?? null,
     fileCount: snapshot?.stats.fileCount ?? 0,
     technologies: snapshot?.technologies ?? [],
