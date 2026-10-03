@@ -45,9 +45,6 @@ export type Detection = {
   location: string;
 };
 
-/** @deprecated Use `Detection`. Kept so existing snapshots and callers still type-check. */
-export type TechnologySignal = Detection;
-
 export type FileKind =
   "source" | "config" | "lockfile" | "document" | "asset" | "secret" | "ignored" | "other";
 
@@ -77,7 +74,7 @@ export type ProjectSnapshot = {
   updatedAt: string;
   contentHash: string;
   files: IndexedFile[];
-  technologies: TechnologySignal[];
+  technologies: Detection[];
   stats: {
     fileCount: number;
     indexedCount: number;
@@ -111,5 +108,5 @@ export type ProjectStatus = {
   projectModelPath: string | null;
   lastIndexedAt: string | null;
   fileCount: number;
-  technologies: TechnologySignal[];
+  technologies: Detection[];
 };

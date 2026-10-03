@@ -3,21 +3,23 @@
   "version": "3.0.0",
   "private": true,
   "type": "module",
-  "description": "Local-first agent enhancement framework (monorepo)",
+  "description": "Agent Kit monorepo: project intelligence layer for AI coding agents",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
     "build": "npm run build -w @mapl6/agent-kit-core && npm run build -w @mapl6/agent-kit",
-    "typecheck": "npm run typecheck -w @mapl6/agent-kit-core && npm run typecheck -w @mapl6/agent-kit",
+    "typecheck": "npm run typecheck -w @mapl6/agent-kit-core && npm run typecheck -w @mapl6/agent-kit && tsc -p tsconfig.json",
     "test": "npm run build && vitest run",
     "test:watch": "vitest",
-    "lint": "eslint \"packages/*/src/**/*.ts\"",
-    "format": "prettier --write \"packages/**/*.{ts,json,md}\" \"*.md\"",
-    "agent-kit": "node packages/cli/dist/index.js"
+    "lint": "eslint \"packages/*/src/**/*.ts\" \"packages/*/tests/**/*.ts\" scripts",
+    "format": "prettier --write \"packages/**/*.{ts,json,md}\" \"docs/**/*.md\" \"*.md\"",
+    "agent-kit": "node packages/cli/dist/index.js",
+    "check": "npm run build && npm run typecheck && npm run lint && npm test",
+    "release:check": "npm run check && npm pack -w @mapl6/agent-kit-core --dry-run && npm pack -w @mapl6/agent-kit --dry-run"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",

@@ -49,12 +49,17 @@ export function renderScanSections(result: ScanResult): string[] {
   );
 
   const labelWidth = Math.min(28, Math.max(10, ...result.detections.map((d) => d.label.length)));
+  const missing: string[] = [];
   for (const category of CATEGORY_ORDER) {
     const items = result.detections.filter((d) => d.category === category);
+    if (items.length === 0) {
+      missing.push(CATEGORY_TITLES[category]);
+      continue;
+    }
     out.push("", CATEGORY_TITLES[category]);
-    if (items.length === 0) out.push("  - none detected");
-    else for (const d of items) out.push(line(d, labelWidth));
+    for (const d of items) out.push(line(d, labelWidth));
   }
+  if (missing.length > 0) out.push("", `Not detected: ${missing.join(", ")}`);
 
   return out;
 }

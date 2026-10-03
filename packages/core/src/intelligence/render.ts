@@ -55,7 +55,7 @@ export function renderModelSections(model: ProjectModel): string[] {
   }
 
   const t = model.testing;
-  out.push("", "Testing");
+  out.push("", "Test files");
   out.push(
     t.testFiles === 0
       ? "  - no test files found"

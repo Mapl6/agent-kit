@@ -1,7 +1,7 @@
 {
   "name": "@mapl6/agent-kit",
   "version": "3.0.0",
-  "description": "Make any codebase easier for AI coding agents to understand, work in and verify. Local-first, read-only repository scanner.",
+  "description": "Make any codebase easier for AI coding agents to understand. Local-first, read-only repository scanner and project model for Cursor, Claude Code, Codex and Copilot.",
   "type": "module",
   "author": "Mapl6 <mahdi.am6@gmail.com>",
   "license": "MIT",
@@ -12,19 +12,21 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "README.md",
     "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepack": "node ../../scripts/copy-package-docs.mjs cli"
   },
   "dependencies": {
     "@mapl6/agent-kit-core": "3.0.0",
     "commander": "^14.0.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "publishConfig": {
     "access": "public"
@@ -38,14 +40,16 @@
   },
   "homepage": "https://github.com/Mapl6/agent-kit#readme",
   "keywords": [
-    "agents.md",
     "ai-agents",
+    "coding-agents",
+    "agents.md",
     "cursor",
     "claude-code",
+    "codex",
     "github-copilot",
-    "cli",
-    "llm",
+    "repository-scanner",
+    "project-intelligence",
     "developer-tools",
-    "project-index"
+    "cli"
   ]
 }

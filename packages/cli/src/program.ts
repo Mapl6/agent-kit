@@ -1,3 +1,4 @@
+import { createRequire } from "node:module";
 import { Command } from "commander";
 import {
   ExitCode,
@@ -15,7 +16,9 @@ import {
   type PlannedWrite,
 } from "@mapl6/agent-kit-core";
 
-const VERSION = "3.0.0";
+const { version: VERSION } = createRequire(import.meta.url)("../package.json") as {
+  version: string;
+};
 
 function createDeps() {
   return {

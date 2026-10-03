@@ -1,7 +1,7 @@
 {
   "name": "@mapl6/agent-kit-core",
   "version": "3.0.0",
-  "description": "Core contracts, indexing, and storage for agent-kit",
+  "description": "Core library for Agent Kit: safe repository discovery, detectors, and the project model.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,18 +12,36 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepack": "node ../../scripts/copy-package-docs.mjs core"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "publishConfig": {
     "access": "public"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "author": "Mapl6 <mahdi.am6@gmail.com>",
+  "keywords": [
+    "ai-agents",
+    "repository-scanner",
+    "project-intelligence",
+    "agent-kit"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mapl6/agent-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Mapl6/agent-kit/issues"
+  },
+  "homepage": "https://github.com/Mapl6/agent-kit#readme"
 }
