@@ -6,7 +6,7 @@
   "author": "Mapl6 <mahdi.am6@gmail.com>",
   "license": "MIT",
   "bin": {
-    "agent-kit": "./dist/index.js"
+    "agent-kit": "dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
