@@ -14,8 +14,8 @@ Understand the repo ──► Prepare the agent ──► Guide & protect ──
 | 0   | Product foundation      | **Done** | 3.0.0   |
 | 1   | Repository scanner      | **Done** | 3.0.0   |
 | 2   | Project intelligence    | **Done** | 3.0.0   |
-| 3   | Agent adapter framework | Next     |         |
-| 4   | Rules + skills          | Planned  |         |
+| 3   | Agent adapter framework | **Done** | 3.1.0   |
+| 4   | Rules + skills          | Next     |         |
 | 5   | Context engine          | Planned  |         |
 | 6   | Verification            | Planned  |         |
 | 7   | Safety                  | Planned  |         |
@@ -65,18 +65,24 @@ Understand the repo ──► Prepare the agent ──► Guide & protect ──
 
 **Carried forward:** tool roles (Vite as library build tool vs app framework).
 
-## Phase 3: Agent adapter framework (next)
+## Phase 3: Agent adapter framework (done)
 
-**Goal:** generate each agent's native configuration from the one project model.
+**Goal:** give every agent the project model through its own loading mechanism.
 
-- `AgentAdapter` interface (`detect`, `capabilities`, `plan`, `apply`) and a capability registry
-- Adapters: generic (`AGENTS.md`), Claude Code, Cursor, Codex, Copilot. Each capability is claimed only after it's verified against that provider's current docs
-- `agent-kit init` generates agent files with a create / update / skip plan, `--dry-run`, and a safe merge into existing files (marker sections, never a blind overwrite)
-- Backups before any change to an existing file; `agent-kit uninstall` removes only what Agent Kit created
+- `AgentAdapter` contract (mode, capabilities with doc links and check date, `detect`, `targets`) and a registry
+- One shared context rendered into a managed block in `AGENTS.md`. Adapters connect agents to it:
+  - **native:** Codex, Cursor
+  - **import:** Claude Code (`@AGENTS.md` added to an existing `CLAUDE.md`)
+  - **translated:** Copilot (`.github/copilot-instructions.md`)
+- `init` sets agents up, `sync` regenerates them, `agents` explains them, `uninstall` reverses everything. All support `--dry-run`
+- Safe merge: only marked blocks are edited; conflicts (bad markers, symlinks) are reported and skipped; backups; install manifest for byte-exact uninstall
+- Repo-derived names are sanitised before reaching agent instructions ([ADR-004](./docs/decisions/ADR-004-agents-md-is-the-canonical-output.md))
 
-**Exit criteria:** golden output per adapter × fixture; existing user content preserved byte-for-byte outside marker sections; one real repo tested per agent.
+**Exit criteria met:** golden output per fixture; user content preserved byte for byte; uninstall restores originals; dry-run on 3 real repos (two already imported `@AGENTS.md`, correctly skipped).
 
-## Phase 4: Rules + skills
+**Carried forward:** adapters were verified against provider docs, not by running each agent end to end; `.cursor/rules` and `.github/instructions` path rules belong to Phase 4.
+
+## Phase 4: Rules + skills (next)
 
 **Goal:** persistent conventions (rules) and on-demand workflows (skills).
 
@@ -122,7 +128,7 @@ Understand the repo ──► Prepare the agent ──► Guide & protect ──
 
 **Goal:** a daily-driver experience.
 
-- `doctor`, `status` (readiness: Ready / Needs attention / Missing), `sync`, `diff`, rollback
+- `doctor`, `status` (readiness: Ready / Needs attention / Missing), `diff`, rollback (`sync` shipped early, in 3.1.0)
 
 ## Phase 10: Learning engine
 

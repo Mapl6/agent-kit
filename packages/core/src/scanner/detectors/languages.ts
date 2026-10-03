@@ -30,6 +30,9 @@ function isToolConfig(base: string): boolean {
   return base.startsWith(".") || /\.config\.[cm]?[jt]s$/.test(base) || base.endsWith(".d.ts");
 }
 
+/** Test-fixture trees hold other projects' code, not this project's. */
+const FIXTURE_DIRS = new Set(["fixtures", "__fixtures__", "testdata"]);
+
 /** Counts source files by extension. Reports languages that are actually present. */
 export const languageDetector: Detector = {
   id: "languages",
@@ -39,6 +42,7 @@ export const languageDetector: Detector = {
     const counts = new Map<string, number>();
     for (const f of ctx.files) {
       if (f.kind === "secret" || f.kind === "ignored") continue;
+      if (f.relativePath.split("/").some((s) => FIXTURE_DIRS.has(s))) continue;
       const base = path.posix.basename(f.relativePath);
       if (isToolConfig(base)) continue;
       const ext = path.posix.extname(base).toLowerCase();

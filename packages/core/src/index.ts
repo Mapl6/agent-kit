@@ -25,3 +25,21 @@ export * from "./intelligence/types.js";
 export * from "./intelligence/model.js";
 export * from "./intelligence/render.js";
 export * from "./storage/project-model-repository.js";
+export * from "./adapters/types.js";
+export * from "./adapters/registry.js";
+export * from "./adapters/markers.js";
+export { renderProjectContext, safeCode } from "./adapters/context.js";
+export {
+  CODEX_MAX_BYTES,
+  INSTALL_MANIFEST,
+  planAgentInstall,
+  planAgentUninstall,
+  readInstallManifest,
+  type FileChange,
+  type InstallManifest,
+  type InstallPlan,
+} from "./adapters/installer.js";
+export * from "./application/agents.js";
+export * from "./application/sync-project.js";
+export * from "./application/uninstall-project.js";
+export * from "./application/list-agents.js";

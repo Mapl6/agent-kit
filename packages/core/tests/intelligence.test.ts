@@ -204,6 +204,8 @@ describe("writing project.json", () => {
       { path: ".agent-kit/config.json", action: "create" },
       { path: ".agent-kit/snapshot.json", action: "create" },
       { path: ".agent-kit/project.json", action: "create" },
+      { path: "AGENTS.md", action: "create" },
+      { path: ".agent-kit/.gitignore", action: "create" },
     ]);
     expect(fs.existsSync(path.join(root, ".agent-kit"))).toBe(false);
   });

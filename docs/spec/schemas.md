@@ -132,10 +132,44 @@ Roles: `source-root`, `routes`, `application`, `ui-components`, `feature-modules
 
 The npm placeholder test script (`echo "Error: no test specified"`) is ignored.
 
-## Config v1 (`.agent-kit/config.json`) — unchanged
+## Config v1 (`.agent-kit/config.json`)
 
 `schemaVersion`, `projectRoot`, `createdAt`, `updatedAt`, `ignoreGlobs`,
-`maxFileBytes`, `followSymlinks: false`.
+`maxFileBytes`, `followSymlinks: false`, and (3.1+) `agents?: string[]`: the
+enabled adapters. An empty list means `--no-agents`. `projectRoot` is ignored
+when reading; the resolved `--path` wins, so a committed `.agent-kit/` works on
+any machine.
+
+## Install manifest (`.agent-kit/state/install.json`)
+
+```ts
+type InstallManifest = {
+  schemaVersion: 1;
+  files: Record<
+    string /* repo-relative path */,
+    {
+      adapter: "agents-md" | "claude-code" | "cursor" | "codex" | "copilot";
+      created: boolean; // Agent Kit created the file → uninstall may delete it
+      separator: string; // text inserted before an appended block → stripped on removal
+    }
+  >;
+};
+```
+
+## Managed blocks in agent files
+
+```
+<!-- BEGIN AGENT-KIT: generated, edits inside this block are overwritten by "agent-kit sync" -->
+…generated content…
+<!-- END AGENT-KIT -->
+```
+
+Exactly one pair per file. Anything else is a conflict, and the file is left alone.
+
+## `.agent-kit/.gitignore`
+
+Created once, never overwritten: `snapshot.json` and `state/backups/` (local,
+machine-specific). Everything else in `.agent-kit/` can be committed.
 
 ## Snapshot v1 (`.agent-kit/snapshot.json`)
 

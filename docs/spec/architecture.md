@@ -22,6 +22,7 @@ core/src/
   domain/      shared types (Detection, Evidence, Confidence, config, snapshot)
   errors/      AppError, ErrorCode, exit codes
   intelligence/ project model: commands, directory roles, architecture, testing, git (Phase 2)
+  adapters/    agent adapters, shared context renderer, managed-block markers, safe installer (Phase 3)
   application/ use cases behind scan / init / index / status
 ```
 
@@ -74,6 +75,26 @@ ProjectModel            .agent-kit/project.json, deterministic, no absolute path
 
 The scanner never imports intelligence. `application/analyze-project.ts`
 composes them. See [ADR-003](../decisions/ADR-003-project-model-is-generated.md).
+
+## Agent adapters (Phase 3)
+
+```
+ProjectModel
+      ↓
+adapters/context    renderProjectContext(): one concise Markdown context
+      ↓
+adapters/registry   AgentAdapter per agent: mode, capabilities (with doc links), detect(), targets()
+      ↓
+adapters/installer  plan: probe each target without following symlinks, then
+                    create / replace block / append block / skip / conflict;
+                    removals for adapters no longer enabled
+      ↓
+apply               backups → atomic writes → install manifest → re-index
+```
+
+Adapters are pure: they return _targets_ (path + block body). Only the
+installer touches the filesystem, so every safety rule lives in one place.
+See [ADR-004](../decisions/ADR-004-agents-md-is-the-canonical-output.md).
 
 ## Precedence (for later phases)
 
