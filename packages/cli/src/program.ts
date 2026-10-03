@@ -1,25 +1,27 @@
 import { Command } from "commander";
 import {
-  AppError,
   ExitCode,
   JsonConfigRepository,
+  JsonProjectModelRepository,
   JsonSnapshotRepository,
+  analyzeProject,
   formatCliError,
-  generateReport,
   getProjectStatus,
   indexProject,
   initProject,
-  renderScanText,
-  scanProject,
+  renderAnalysisText,
+  serializeProjectModel,
   toExitCode,
+  type PlannedWrite,
 } from "@mapl6/agent-kit-core";
 
-const VERSION = "2.1.0";
+const VERSION = "3.0.0";
 
 function createDeps() {
   return {
     configs: new JsonConfigRepository(),
     snapshots: new JsonSnapshotRepository(),
+    models: new JsonProjectModelRepository(),
   };
 }
 
@@ -32,26 +34,47 @@ async function run(action: () => Promise<void>): Promise<void> {
   }
 }
 
+function printWrites(writes: PlannedWrite[], dryRun: boolean): void {
+  console.log(dryRun ? "Dry run. Would write:" : "Files:");
+  for (const w of writes) {
+    const verb = w.action === "unchanged" ? "unchanged" : dryRun ? `would ${w.action}` : w.action;
+    console.log(`  ${verb.padEnd(14)} ${w.path}`);
+  }
+  if (dryRun) console.log("No changes made.");
+}
+
 export function createProgram(): Command {
   const program = new Command();
   const deps = createDeps();
 
-  program.name("agent-kit").description("Local-first agent enhancement framework").version(VERSION);
+  program
+    .name("agent-kit")
+    .description("Project intelligence layer for AI coding agents")
+    .version(VERSION);
 
   program
     .command("scan", { isDefault: true })
     .description("Analyze the repository (read-only, default command)")
     .option("--path <path>", "Project path", ".")
-    .option("--json", "Print the scan result as JSON", false)
-    .action(async (options: { path: string; json?: boolean }) => {
+    .option("--json", "Print the raw scan result (detections) as JSON", false)
+    .option(
+      "--model",
+      "Print the project model as JSON (what `index` writes to project.json)",
+      false,
+    )
+    .action(async (options: { path: string; json?: boolean; model?: boolean }) => {
       await run(async () => {
         const started = Date.now();
-        const result = await scanProject({ path: options.path });
-        if (options.json) {
-          console.log(JSON.stringify(result, null, 2));
+        const { scan, model } = await analyzeProject({ path: options.path });
+        if (options.model) {
+          process.stdout.write(serializeProjectModel(model));
           return;
         }
-        console.log(renderScanText(result));
+        if (options.json) {
+          console.log(JSON.stringify(scan, null, 2));
+          return;
+        }
+        console.log(renderAnalysisText(scan, model));
         console.log(`Scanned in ${Date.now() - started} ms.`);
       });
     });
@@ -62,45 +85,44 @@ export function createProgram(): Command {
     .option("--path <path>", "Project path", ".")
     .option("--skip-index", "Skip initial indexing", false)
     .option("--force", "Re-write config if already initialized", false)
-    .action(async (options: { path: string; skipIndex?: boolean; force?: boolean }) => {
-      await run(async () => {
-        const result = await initProject(
-          {
-            path: options.path,
-            skipIndex: Boolean(options.skipIndex),
-            force: Boolean(options.force),
-          },
-          deps,
-        );
-        console.log(`Initialized agent-kit at ${result.projectRoot}`);
-        console.log(`  config: .agent-kit/config.json`);
-        if (result.index) {
-          console.log(
-            `  index: ${result.index.snapshot.stats.fileCount} files` +
-              ` (${result.index.added} added, ${result.index.updated} updated, ${result.index.removed} removed)`,
+    .option("--dry-run", "Show what would be written without writing", false)
+    .action(
+      async (options: { path: string; skipIndex?: boolean; force?: boolean; dryRun?: boolean }) => {
+        await run(async () => {
+          const result = await initProject(
+            {
+              path: options.path,
+              skipIndex: Boolean(options.skipIndex),
+              force: Boolean(options.force),
+              dryRun: Boolean(options.dryRun),
+            },
+            deps,
           );
-        } else {
-          console.log("  index: skipped");
-        }
-      });
-    });
+          console.log(
+            `${result.dryRun ? "Would initialize" : "Initialized"} agent-kit at ${result.projectRoot}`,
+          );
+          printWrites(result.writes, result.dryRun);
+        });
+      },
+    );
 
   program
     .command("index")
-    .description("Build or refresh the project snapshot")
+    .description("Refresh .agent-kit/snapshot.json and .agent-kit/project.json")
     .option("--path <path>", "Project path", ".")
-    .action(async (options: { path: string }) => {
+    .option("--dry-run", "Show what would be written without writing", false)
+    .action(async (options: { path: string; dryRun?: boolean }) => {
       await run(async () => {
-        const result = await indexProject({ path: options.path }, deps);
-        const { snapshot, created, changed, added, removed, updated } = result;
-        console.log(
-          created ? "Created snapshot." : changed ? "Updated snapshot." : "Snapshot unchanged.",
+        const result = await indexProject(
+          { path: options.path, dryRun: Boolean(options.dryRun) },
+          deps,
         );
+        const { snapshot, added, removed, updated } = result;
         console.log(
-          `  files=${snapshot.stats.fileCount} hashed=${snapshot.stats.indexedCount} skipped=${snapshot.stats.skippedCount}`,
+          `files=${snapshot.stats.fileCount} hashed=${snapshot.stats.indexedCount} skipped=${snapshot.stats.skippedCount}` +
+            ` delta: +${added} ~${updated} -${removed}`,
         );
-        console.log(`  delta: +${added} ~${updated} -${removed}`);
-        console.log(`  tech: ${snapshot.technologies.map((t) => t.label).join(", ") || "none"}`);
+        printWrites(result.writes, Boolean(options.dryRun));
       });
     });
 
@@ -114,45 +136,17 @@ export function createProgram(): Command {
         if (!status.initialized) {
           console.log(`Not initialized: ${status.projectRoot}`);
           console.log("Suggested action:");
-          console.log("  Run `agent-kit init`");
+          console.log("  Run `agent-kit init` (or `agent-kit init --dry-run` to preview)");
           process.exitCode = ExitCode.INVALID_INPUT;
           return;
         }
         console.log(`Initialized: ${status.projectRoot}`);
         console.log(`  last index: ${status.lastIndexedAt ?? "never"}`);
         console.log(`  files: ${status.fileCount}`);
-        console.log(`  tech: ${status.technologies.map((t) => t.label).join(", ") || "none"}`);
-      });
-    });
-
-  program
-    .command("report")
-    .description("[deprecated: use `scan`] Write Markdown/JSON report and onboarding prompt")
-    .option("--path <path>", "Project path", ".")
-    .option("--format <format>", "markdown | json | both", "both")
-    .option("--stdout", "Print report to stdout instead of only writing files", false)
-    .action(async (options: { path: string; format: string; stdout?: boolean }) => {
-      await run(async () => {
-        console.error(
-          "Note: `report` is deprecated and will be removed in a future version. Use `agent-kit scan` or `agent-kit scan --json`.",
+        console.log(
+          `  project model: ${status.projectModelPath ? "present" : "missing (run `agent-kit index`)"}`,
         );
-        const format = options.format;
-        if (format !== "markdown" && format !== "json" && format !== "both") {
-          throw new AppError({
-            code: "UNSUPPORTED_OPERATION",
-            message: `Unsupported report format: ${format}`,
-            suggestedAction: "Use --format markdown, json, or both.",
-          });
-        }
-        const result = await generateReport({ path: options.path, format, write: true }, deps);
-        console.log("Wrote:");
-        for (const p of result.writtenPaths) console.log(`  ${p}`);
-        if (options.stdout) {
-          for (const report of result.reports) {
-            console.log(`\n----- ${report.format} -----\n`);
-            console.log(report.body);
-          }
-        }
+        console.log(`  tech: ${status.technologies.map((t) => t.label).join(", ") || "none"}`);
       });
     });
 

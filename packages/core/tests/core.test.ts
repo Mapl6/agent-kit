@@ -6,6 +6,7 @@ import {
   AppError,
   ExitCode,
   JsonConfigRepository,
+  JsonProjectModelRepository,
   JsonSnapshotRepository,
   classifyFile,
   discoverFiles,
@@ -110,6 +111,7 @@ describe("init / index / status", () => {
   const deps = () => ({
     configs: new JsonConfigRepository(),
     snapshots: new JsonSnapshotRepository(),
+    models: new JsonProjectModelRepository(),
   });
 
   it("initializes, indexes, and is idempotent on second index", async () => {
@@ -152,10 +154,10 @@ describe("init / index / status", () => {
 
   it("fails clearly when project path is missing", async () => {
     const d = deps();
-    await expect(initProject({ path: path.join(os.tmpdir(), "no-such-agent-kit-dir") }, d)).rejects.toMatchObject(
-      {
-        code: "PROJECT_NOT_FOUND",
-      },
-    );
+    await expect(
+      initProject({ path: path.join(os.tmpdir(), "no-such-agent-kit-dir") }, d),
+    ).rejects.toMatchObject({
+      code: "PROJECT_NOT_FOUND",
+    });
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@mapl6/agent-kit",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Make any codebase easier for AI coding agents to understand, work in and verify. Local-first, read-only repository scanner.",
   "type": "module",
   "author": "Mapl6 <mahdi.am6@gmail.com>",
@@ -12,7 +12,6 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "templates",
     "LICENSE"
   ],
   "scripts": {
@@ -21,7 +20,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mapl6/agent-kit-core": "2.1.0",
+    "@mapl6/agent-kit-core": "3.0.0",
     "commander": "^14.0.0"
   },
   "engines": {

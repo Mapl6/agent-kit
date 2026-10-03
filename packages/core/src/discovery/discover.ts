@@ -2,11 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { FileKind, IndexedFile } from "../domain/types.js";
 import { classifyFile } from "./classify.js";
-import {
-  isIgnoredDirName,
-  isSecretPath,
-  matchesIgnoreGlobs,
-} from "./ignore.js";
+import { isIgnoredDirName, isSecretPath, matchesIgnoreGlobs } from "./ignore.js";
 import { isSafeUnderRoot } from "./root-safety.js";
 
 export type DiscoverOptions = {
@@ -127,10 +123,7 @@ export async function discoverFiles(options: DiscoverOptions): Promise<Discovere
   return results;
 }
 
-export function toIndexedFile(
-  entry: DiscoveredEntry,
-  contentHash: string | null,
-): IndexedFile {
+export function toIndexedFile(entry: DiscoveredEntry, contentHash: string | null): IndexedFile {
   const file: IndexedFile = {
     path: entry.relativePath,
     kind: entry.kind,

@@ -1,20 +1,25 @@
 import type {
   IndexResult,
+  PlannedWrite,
   IndexedFile,
   ProjectConfig,
   ProjectSnapshot,
-  TechnologySignal,
 } from "../domain/types.js";
 import { SNAPSHOT_SCHEMA_VERSION } from "../domain/types.js";
 import { AppError } from "../errors/AppError.js";
 import { discoverFiles, toIndexedFile } from "../discovery/discover.js";
+import { buildProjectModel } from "../intelligence/model.js";
 import { scanEntries } from "../scanner/scan.js";
-import type { SnapshotRepository } from "../ports/repositories.js";
+import type { ProjectModelRepository, SnapshotRepository } from "../ports/repositories.js";
+import { serializeProjectModel } from "../storage/project-model-repository.js";
 import { hashFileContents, hashSnapshotPayload } from "./hash.js";
 
 export type IndexerDeps = {
   snapshots: SnapshotRepository;
+  models: ProjectModelRepository;
   now?: () => Date;
+  /** Compute everything and report planned writes, but write nothing. */
+  dryRun?: boolean;
 };
 
 export async function buildProjectIndex(
@@ -45,8 +50,9 @@ export async function buildProjectIndex(
       files.push(toIndexedFile(entry, contentHash));
     }
 
-    const technologies: TechnologySignal[] = (await scanEntries(config.projectRoot, discovered))
-      .detections;
+    const scan = await scanEntries(config.projectRoot, discovered);
+    const technologies = scan.detections;
+    const model = await buildProjectModel(scan, discovered);
 
     const contentHash = hashSnapshotPayload(
       files.map((f) => `${f.path}:${f.contentHash ?? f.skippedReason ?? ""}:${f.mtimeMs}`),
@@ -83,11 +89,27 @@ export async function buildProjectIndex(
       updated > 0 ||
       previous?.contentHash !== snapshot.contentHash;
 
-    if (changed) {
-      await deps.snapshots.write(snapshot);
+    const previousModel = await deps.models.readRaw(config.projectRoot);
+    const modelAction: PlannedWrite["action"] =
+      previousModel === null
+        ? "create"
+        : previousModel === serializeProjectModel(model)
+          ? "unchanged"
+          : "update";
+    const writes: PlannedWrite[] = [
+      {
+        path: ".agent-kit/snapshot.json",
+        action: created ? "create" : changed ? "update" : "unchanged",
+      },
+      { path: ".agent-kit/project.json", action: modelAction },
+    ];
+
+    if (!deps.dryRun) {
+      if (changed) await deps.snapshots.write(snapshot);
+      if (modelAction !== "unchanged") await deps.models.write(config.projectRoot, model);
     }
 
-    return { snapshot, created, changed, added, removed, updated };
+    return { snapshot, model, writes, created, changed, added, removed, updated };
   } catch (cause) {
     if (AppError.isAppError(cause)) throw cause;
     throw new AppError({

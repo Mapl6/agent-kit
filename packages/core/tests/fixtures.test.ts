@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   JsonConfigRepository,
+  JsonProjectModelRepository,
   JsonSnapshotRepository,
   initProject,
   isSecretPath,
@@ -29,6 +30,7 @@ describe("fixture projects", () => {
   const deps = {
     configs: new JsonConfigRepository(),
     snapshots: new JsonSnapshotRepository(),
+    models: new JsonProjectModelRepository(),
   };
 
   it("detects vite-react fixture technologies", async () => {

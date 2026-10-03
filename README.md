@@ -4,7 +4,9 @@
 
 Agent Kit is a local-first project intelligence layer that sits between your repository and the coding agent you already use (Cursor, Claude Code, Codex, Copilot, …). It is not another agent.
 
-It starts by **understanding the repository**. `agent-kit scan` reports languages, package managers, workspaces, frameworks, test runners, tooling, CI and existing AI-agent configuration, with evidence for every finding and a clear line between what was _detected_ and what was _inferred_. It's read-only, runs offline, and never executes project code.
+It starts by **understanding the repository**, then builds a **project model**: the commands to install, build, test, lint and typecheck; what each directory is for; architecture patterns; testing conventions; and git conventions. Every inference carries a confidence level and evidence.
+
+`agent-kit scan` reports languages, package managers, workspaces, frameworks, test runners, tooling, CI and existing AI-agent configuration, with evidence for every finding and a clear line between what was _detected_ and what was _inferred_. It's read-only, runs offline, and never executes project code.
 
 Roadmap and status: [PROGRESS.md](./PROGRESS.md) · Specs: [docs/spec/](./docs/spec/)
 
@@ -40,13 +42,12 @@ Requires Node.js **18+**.
 
 ## Commands
 
-| Command                                              | Writes                     | Description                                                                                         |
-| ---------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------- |
-| `agent-kit scan [--path .] [--json]`                 | nothing                    | **Default.** Analyze the repository. `--json` prints a stable [ScanResult](./docs/spec/schemas.md). |
-| `agent-kit init [--path .] [--skip-index] [--force]` | `.agent-kit/`              | Create config and the first index snapshot.                                                         |
-| `agent-kit index [--path .]`                         | `.agent-kit/snapshot.json` | Refresh the incremental file index.                                                                 |
-| `agent-kit status [--path .]`                        | nothing                    | Show init/index state.                                                                              |
-| `agent-kit report …`                                 | `.agent-kit/reports/`      | _Deprecated_. Use `scan`.                                                                           |
+| Command                                                          | Writes        | Description                                                                                                                                                                                              |
+| ---------------------------------------------------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `agent-kit scan [--path .] [--json \| --model]`                  | nothing       | **Default.** Detections plus the project model: commands, directory roles, architecture, testing, git conventions. `--json` prints the [ScanResult](./docs/spec/schemas.md), `--model` the ProjectModel. |
+| `agent-kit init [--path .] [--skip-index] [--force] [--dry-run]` | `.agent-kit/` | Create config, index snapshot and `project.json`. `--dry-run` lists what would change.                                                                                                                   |
+| `agent-kit index [--path .] [--dry-run]`                         | `.agent-kit/` | Refresh the snapshot and `project.json` (rewritten only if changed).                                                                                                                                     |
+| `agent-kit status [--path .]`                                    | nothing       | Show init/index state.                                                                                                                                                                                   |
 
 More commands (`doctor`, `verify`, `sync`, `handoff`, …) arrive phase by phase. See the [CLI spec](./docs/spec/cli.md).
 

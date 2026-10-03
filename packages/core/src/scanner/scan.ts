@@ -31,6 +31,13 @@ export type ScanOptions = {
 
 /** Read-only repository scan. Writes nothing and executes no project code. */
 export async function scanProject(options: ScanOptions): Promise<ScanResult> {
+  return (await discoverAndScan(options)).scan;
+}
+
+/** Shared by scan and analyze: one tree walk, wrapped in a stable error. */
+export async function discoverAndScan(
+  options: ScanOptions,
+): Promise<{ scan: ScanResult; entries: DiscoveredEntry[] }> {
   const root = await resolveProjectRoot(options.path);
   try {
     const entries = await discoverFiles({
@@ -38,7 +45,7 @@ export async function scanProject(options: ScanOptions): Promise<ScanResult> {
       ignoreGlobs: options.ignoreGlobs ?? [],
       maxFileBytes: options.maxFileBytes ?? DEFAULT_MAX_FILE_BYTES,
     });
-    return await scanEntries(root, entries, options.detectors);
+    return { scan: await scanEntries(root, entries, options.detectors), entries };
   } catch (cause) {
     if (AppError.isAppError(cause)) throw cause;
     throw new AppError({

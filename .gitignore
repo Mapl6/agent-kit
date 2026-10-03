@@ -13,3 +13,4 @@ coverage/
 *.tsbuildinfo
 .agent-kit/
 fixtures/**/.agent-kit/
+!fixtures/**/.env

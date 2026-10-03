@@ -1,3 +1,5 @@
+import type { ProjectModel } from "../intelligence/types.js";
+
 export const SNAPSHOT_SCHEMA_VERSION = 1 as const;
 export const CONFIG_SCHEMA_VERSION = 1 as const;
 export const AGENT_KIT_DIR = ".agent-kit";
@@ -84,8 +86,16 @@ export type ProjectSnapshot = {
   };
 };
 
+/** A file Agent Kit wrote, or would write under --dry-run. Path is repo-relative. */
+export type PlannedWrite = {
+  path: string;
+  action: "create" | "update" | "unchanged";
+};
+
 export type IndexResult = {
   snapshot: ProjectSnapshot;
+  model: ProjectModel;
+  writes: PlannedWrite[];
   created: boolean;
   changed: boolean;
   added: number;
@@ -98,15 +108,8 @@ export type ProjectStatus = {
   projectRoot: string;
   configPath: string | null;
   snapshotPath: string | null;
+  projectModelPath: string | null;
   lastIndexedAt: string | null;
   fileCount: number;
   technologies: TechnologySignal[];
-};
-
-export type ReportFormat = "markdown" | "json";
-
-export type ProjectReport = {
-  format: ReportFormat;
-  body: string;
-  onboardingPrompt: string;
 };

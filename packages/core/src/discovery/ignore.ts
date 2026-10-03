@@ -17,6 +17,8 @@ export const DEFAULT_IGNORE_DIRS = new Set([
   ".cache",
   ".agent-kit",
   "storybook-static",
+  "test-results",
+  "playwright-report",
 ]);
 
 /** Basename / relative-path patterns treated as secrets (never hashed/logged as content). */

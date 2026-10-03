@@ -21,8 +21,8 @@ core/src/
   storage/     atomic JSON writes, .agent-kit paths, repositories
   domain/      shared types (Detection, Evidence, Confidence, config, snapshot)
   errors/      AppError, ErrorCode, exit codes
-  application/ use cases behind init / index / status / report
-  reports/     legacy Markdown/JSON report (deprecated with `report`)
+  intelligence/ project model: commands, directory roles, architecture, testing, git (Phase 2)
+  application/ use cases behind scan / init / index / status
 ```
 
 ## Scan pipeline
@@ -57,6 +57,24 @@ processes or use the network. Add one by writing it and listing it in
 `scanner/registry.ts`; frameworks/testing/tooling are rows in
 `scanner/detectors/table.ts`.
 
+## Project model (Phase 2)
+
+```
+ScanResult (facts) + discovered files
+      ↓
+intelligence/commands   package.json scripts → install/dev/build/test/e2e/lint/typecheck/format;
+                        tool present but no script → inferred fallback (e.g. `pnpm exec tsc --noEmit`)
+intelligence/structure  top-level and src/ directories → roles (name + file-pattern evidence);
+                        architecture signals (App Router, feature modules, UI/service/state layers, monorepo)
+intelligence/testing    test file patterns and placement (colocated / separate / mixed)
+intelligence/git        hooks, commit convention, CI, PR template, CODEOWNERS (never reads .git/)
+      ↓
+ProjectModel            .agent-kit/project.json, deterministic, no absolute paths
+```
+
+The scanner never imports intelligence. `application/analyze-project.ts`
+composes them. See [ADR-003](../decisions/ADR-003-project-model-is-generated.md).
+
 ## Precedence (for later phases)
 
 Developer decision > project rule > generated recommendation > automatic
@@ -64,7 +82,7 @@ inference. Conflicts between sources are surfaced, never silently resolved.
 
 ## Planned `.agent-kit/` layout
 
-Today `.agent-kit/` holds `config.json`, `snapshot.json` and `reports/`. The
+Today `.agent-kit/` holds `config.json`, `snapshot.json` and `project.json`. The
 target layout (manifest, project model, rules, skills, memory, state, …) is
 introduced phase by phase, with a migration for existing config at that time.
 See [schemas.md](./schemas.md).

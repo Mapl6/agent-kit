@@ -37,7 +37,16 @@ const CONFIG_NAMES = new Set([
   "makefile",
 ]);
 
-const CONFIG_EXT = new Set([".json", ".yml", ".yaml", ".toml", ".ini", ".config.js", ".config.mjs", ".config.ts"]);
+const CONFIG_EXT = new Set([
+  ".json",
+  ".yml",
+  ".yaml",
+  ".toml",
+  ".ini",
+  ".config.js",
+  ".config.mjs",
+  ".config.ts",
+]);
 
 const LOCKFILES = new Set([
   "package-lock.json",

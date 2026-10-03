@@ -34,6 +34,9 @@ export class JsonConfigRepository implements ConfigRepository {
 
   async write(config: ProjectConfig): Promise<void> {
     const validated = assertValidConfig(config);
-    await writeFileAtomic(configPath(validated.projectRoot), `${JSON.stringify(validated, null, 2)}\n`);
+    await writeFileAtomic(
+      configPath(validated.projectRoot),
+      `${JSON.stringify(validated, null, 2)}\n`,
+    );
   }
 }

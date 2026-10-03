@@ -186,4 +186,5 @@ etc. come after the JS set is trustworthy, as spec Phase 1 lists only JS/TS).
 
 - `scan` doesn't read `.agent-kit/config.json` ignore globs yet; it uses defaults. Wiring them in is trivial once config v2 lands.
 - No `symlink-escape` fixture on disk; symlink cases are built at test time (git and npm pack handle committed symlinks inconsistently).
+- 3.0.0 cleanup: `report`, the reports module and the unused `cli/templates/` were removed instead of parked. They're recoverable from git history (commit `da94aa1` and earlier) if Phase 3–4 needs them.
 - Languages are detected by counting source files (any language), not inferred from `package.json`. A repo with only `package.json` reports Node.js but no language, which is accurate.

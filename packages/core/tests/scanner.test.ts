@@ -45,6 +45,7 @@ describe("scan golden output", () => {
     "plain-node",
     "with-secrets",
     "unknown",
+    "react-features",
   ];
 
   for (const name of names) {
