@@ -15,8 +15,8 @@ Understand the repo ──► Prepare the agent ──► Guide & protect ──
 | 1   | Repository scanner      | **Done** | 3.0.0   |
 | 2   | Project intelligence    | **Done** | 3.0.0   |
 | 3   | Agent adapter framework | **Done** | 3.1.0   |
-| 4   | Rules + skills          | Next     |         |
-| 5   | Context engine          | Planned  |         |
+| 4   | Rules + skills          | **Done** | 3.2.0   |
+| 5   | Context engine          | Next     |         |
 | 6   | Verification            | Planned  |         |
 | 7   | Safety                  | Planned  |         |
 | 8   | Memory + handoff        | Planned  |         |
@@ -82,17 +82,21 @@ Understand the repo ──► Prepare the agent ──► Guide & protect ──
 
 **Carried forward:** adapters were verified against provider docs, not by running each agent end to end; `.cursor/rules` and `.github/instructions` path rules belong to Phase 4.
 
-## Phase 4: Rules + skills (next)
+## Phase 4: Rules + skills (done)
 
-**Goal:** persistent conventions (rules) and on-demand workflows (skills).
+**Goal:** persistent conventions (rules) and on-demand workflows (skills), written once.
 
-- Rules engine: categorised and path-scoped rules in `.agent-kit/rules/`, translated per adapter
-- Skills in the open `SKILL.md` structure; scripts are never executed on install
-- Conflict detection across sources (e.g. "use Vitest" vs "use Jest"), surfaced and never silently resolved
+- Rules in `.agent-kit/rules/<id>.md` (`description`, optional `paths`). Global rules go into the shared context; path rules become native files for Claude Code (`paths`), Cursor (`globs`) and Copilot (`applyTo`), plus an `AGENTS.md` index for Codex
+- Skills in `.agent-kit/skills/<name>/`, validated against the Agent Skills spec and copied to `.agents/skills/` and `.claude/skills/`
+- Skills with executable files are installed only after `agent-kit skills approve`. Approval is tied to a content hash; copies are never executable and never run
+- Generated files are owned by content hash: hand edits and foreign files are conflicts, never overwritten. Uninstall keeps your rules and skills
+- `agent-kit conflicts`: instructions that contradict the repo (e.g. Jest vs Vitest) or each other, with file and line. `--ci` to enforce ([ADR-005](./docs/decisions/ADR-005-rules-and-skills.md))
 
-**Exit criteria:** conflict tests; skills with scripts flagged for review.
+**Exit criteria met:** conflict tests (repo contradiction, negation, cross-file, registry-sense "npm" ignored); scripts flagged and gated; golden output and Prettier stability per agent format; uninstall restores the tree; no false positives on 4 real repos.
 
-## Phase 5: Context engine
+**Carried forward:** built-in skill packs (Phase 11); with Claude Code enabled, Cursor and Copilot may list a skill twice (identical copies in `.claude/skills` and `.agents/skills`).
+
+## Phase 5: Context engine (next)
 
 **Goal:** give agents the minimum relevant context, not everything.
 

@@ -10,6 +10,9 @@ import {
   type FileChange,
 } from "../adapters/installer.js";
 import type { AgentId } from "../adapters/types.js";
+import { detectConflicts } from "../rules/conflicts.js";
+import { loadRules } from "../rules/rules.js";
+import { isSkillDistributable, loadSkills } from "../rules/skills.js";
 import path from "node:path";
 
 /** Local-only files inside .agent-kit/ that shouldn't be committed. */
@@ -29,10 +32,25 @@ export async function installAgents(options: {
   agents: AgentId[];
   explicit: AgentId[];
   dryRun: boolean;
+  approvedSkills?: Record<string, string>;
   now?: Date;
 }): Promise<AgentInstallResult> {
   const { root, model, agents, explicit, dryRun } = options;
-  const plan = await planAgentInstall(root, model, agents, explicit);
+  const { rules, problems: ruleProblems } = await loadRules(root);
+  const { skills, problems: skillProblems } = await loadSkills(root);
+  const ready = skills.filter((s) => isSkillDistributable(s, options.approvedSkills));
+  const pending = skills.filter((s) => !isSkillDistributable(s, options.approvedSkills));
+
+  const plan = await planAgentInstall(root, model, agents, explicit, { rules, skills: ready });
+  const notes = [
+    ...ruleProblems.map((p) => `Rule skipped: ${p.source}: ${p.message}`),
+    ...skillProblems.map((p) => `Skill skipped: ${p.source}: ${p.message}`),
+    ...pending.map(
+      (s) =>
+        `Skill "${s.name}" contains executable files (${s.scripts.slice(0, 3).join(", ")}${s.scripts.length > 3 ? ", …" : ""}). ` +
+        `Review it, then run \`agent-kit skills approve ${s.name}\` to install it.`,
+    ),
+  ];
 
   const gitignorePath = `${AGENT_KIT_DIR}/.gitignore`;
   const existing = await createFileProbe(root).read(gitignorePath);
@@ -53,7 +71,7 @@ export async function installAgents(options: {
   return {
     agents,
     writes,
-    warnings: plan.warnings,
+    warnings: [...notes, ...plan.warnings, ...(await conflictNote(root, model))],
     conflicts: writes.filter((w) => w.action === "conflict").length,
   };
 }
@@ -72,4 +90,12 @@ export function changedRepoFiles(changes: readonly FileChange[]): boolean {
       !c.path.startsWith(`${AGENT_KIT_DIR}/`) &&
       ["create", "update", "remove", "delete"].includes(c.action),
   );
+}
+
+async function conflictNote(root: string, model: ProjectModel): Promise<string[]> {
+  const conflicts = await detectConflicts(root, model);
+  if (conflicts.length === 0) return [];
+  return [
+    `${conflicts.length} possible conflict(s) between instruction files and the repo. Run \`agent-kit conflicts\` to review.`,
+  ];
 }

@@ -127,6 +127,39 @@ Agent Kit only edits inside its block. It backs files up before changing them,
 refuses symlinks and broken markers, and `agent-kit uninstall` restores every
 file byte for byte. Run `agent-kit sync` after your tooling changes.
 
+## Rules, skills and conflicts
+
+Write project rules and reusable workflows once, in `.agent-kit/`. Agent Kit
+translates them into each agent's own format on `sync`:
+
+```bash
+npx @mapl6/agent-kit rules new api-calls --description "API calls go through services"
+npx @mapl6/agent-kit rules new testing --paths "src/**/*.test.{ts,tsx}"
+npx @mapl6/agent-kit skills new release-notes
+npx @mapl6/agent-kit sync
+```
+
+| You write                                               | Agents get                                                                                                                                                                   |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A rule without `paths`                                  | Included in the `AGENTS.md` context, so every agent loads it                                                                                                                 |
+| A rule with `paths`                                     | `.claude/rules/agent-kit/`, `.cursor/rules/agent-kit/*.mdc`, `.github/instructions/agent-kit/`, each loaded only for matching files (plus an index in `AGENTS.md` for Codex) |
+| A skill ([Agent Skills](https://agentskills.io) format) | `.agents/skills/` (Codex, Cursor, Copilot) and `.claude/skills/` (Claude Code)                                                                                               |
+
+**Skills with scripts are treated as code.** They aren't installed until you
+review them and run `agent-kit skills approve <name>`. Any later edit withdraws
+the approval, and Agent Kit never runs them.
+
+**Conflicting instructions are surfaced, never silently resolved:**
+
+```text
+$ npx @mapl6/agent-kit conflicts
+⚠ Instructions disagree with the test runner this repo uses (vitest).
+    AGENTS.md:3  jest: Run tests with Jest: `npx jest`.
+```
+
+`agent-kit conflicts --ci` exits with code 2 when it finds any, so you can
+enforce it in CI.
+
 ## Commands
 
 | Command                             | Writes                     | What it does                                                                                                                                                                      |
@@ -170,9 +203,8 @@ console.log(test?.command); // "yarn vitest run"
 
 ## Roadmap
 
-Understanding the repository (phases 0–2) and setting up your agents (phase 3)
-are done. Next: rules and skills (path-scoped rules, reusable workflows,
-conflict detection), a context budget, verification (`agent-kit verify`), safety
+Understanding the repository (phases 0–2), setting up your agents (phase 3) and
+rules, skills and conflict detection (phase 4) are done. Next: a context budget, verification (`agent-kit verify`), safety
 policies, and memory and handoff between sessions.
 
 See the full [roadmap](https://github.com/Mapl6/agent-kit/blob/main/ROADMAP.md).

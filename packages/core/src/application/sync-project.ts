@@ -71,6 +71,7 @@ export async function syncProject(options: SyncOptions, deps: SyncDeps): Promise
     agents,
     explicit,
     dryRun,
+    approvedSkills: config.approvedSkills,
     now: deps.now?.(),
   });
 

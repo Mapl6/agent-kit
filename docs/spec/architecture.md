@@ -23,6 +23,7 @@ core/src/
   errors/      AppError, ErrorCode, exit codes
   intelligence/ project model: commands, directory roles, architecture, testing, git (Phase 2)
   adapters/    agent adapters, shared context renderer, managed-block markers, safe installer (Phase 3)
+  rules/       rules and skills: loading, validation, frontmatter reader, conflict detection (Phase 4)
   application/ use cases behind scan / init / index / status
 ```
 

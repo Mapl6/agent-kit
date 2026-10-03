@@ -1,5 +1,7 @@
 import type { Evidence } from "../domain/types.js";
 import type { ProjectModel } from "../intelligence/types.js";
+import type { Rule } from "../rules/rules.js";
+import type { Skill } from "../rules/skills.js";
 
 export const AGENT_IDS = ["agents-md", "claude-code", "cursor", "codex", "copilot"] as const;
 export type AgentId = (typeof AGENT_IDS)[number];
@@ -27,7 +29,8 @@ export type AgentCapabilities = {
 export type AdapterMode = "native" | "import" | "translated";
 
 /** A managed block an adapter wants in a file. The installer owns merging and safety. */
-export type AdapterTarget = {
+export type BlockTarget = {
+  kind: "block";
   adapter: AgentId;
   /** Repo-relative file path. */
   path: string;
@@ -42,6 +45,20 @@ export type AdapterTarget = {
   skipWhen?: (outsideBlock: string) => string | null;
 };
 
+/**
+ * A whole file Agent Kit generates and owns (rule translations, skill copies).
+ * Ownership is proven by the manifest's content hash, so a hand-edited copy is
+ * never overwritten.
+ */
+export type FileTarget = {
+  kind: "file";
+  adapter: AgentId;
+  path: string;
+  content: Buffer;
+};
+
+export type AdapterTarget = BlockTarget | FileTarget;
+
 /** Read-only, symlink-safe view of the files adapters may inspect. */
 export type FileProbe = {
   isFile(relativePath: string): Promise<boolean>;
@@ -55,6 +72,10 @@ export type AdapterContext = {
   files: FileProbe;
   /** True when the user asked for this adapter explicitly (vs. auto-detected). */
   explicit: boolean;
+  /** Valid rules from .agent-kit/rules/. */
+  rules: Rule[];
+  /** Valid skills cleared for distribution (no scripts, or scripts approved). */
+  skills: Skill[];
 };
 
 export interface AgentAdapter {

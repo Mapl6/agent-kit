@@ -6,6 +6,13 @@ import {
   JsonProjectModelRepository,
   JsonSnapshotRepository,
   analyzeProject,
+  approveSkill,
+  splitList,
+  findConflicts,
+  listRules,
+  listSkills,
+  newRule,
+  newSkill,
   formatCliError,
   getProjectStatus,
   indexProject,
@@ -276,6 +283,144 @@ export function createProgram(): Command {
         });
         printWrites(result.writes, result.dryRun);
         finish(result);
+      });
+    });
+
+  const rules = program
+    .command("rules")
+    .description("List rules from .agent-kit/rules/ and where each one is installed")
+    .option("--path <path>", "Project path", ".")
+    .option("--json", "Print as JSON", false)
+    .action(async (options: { path: string; json?: boolean }) => {
+      await run(async () => {
+        const result = await listRules({ path: options.path }, deps);
+        if (options.json) {
+          console.log(JSON.stringify(result, null, 2));
+          return;
+        }
+        if (result.rules.length === 0 && result.problems.length === 0) {
+          console.log(
+            'No rules yet. Create one with `agent-kit rules new <id> [--paths "src/api/**"]`.',
+          );
+          return;
+        }
+        for (const r of result.rules) {
+          console.log(`${r.id}: ${r.description}`);
+          console.log(`  applies to: ${r.paths.length ? r.paths.join(", ") : "all files"}`);
+          console.log(`  installed as: ${r.outputs.join(", ") || "(no agents enabled)"}`);
+        }
+        for (const p of result.problems) console.log(`⚠ ${p.source}: ${p.message}`);
+        if (result.problems.length) process.exitCode = ExitCode.INVALID_INPUT;
+      });
+    });
+
+  rules
+    .command("new <id>")
+    .description("Create .agent-kit/rules/<id>.md from a template")
+    .option("--path <path>", "Project path", ".")
+    .option("--description <text>", "One-line summary of the rule")
+    .option("--paths <globs>", "Comma-separated globs the rule applies to (default: all files)")
+    .action(async (id: string, options: { path: string; description?: string; paths?: string }) => {
+      await run(async () => {
+        const rel = await newRule({
+          path: options.path,
+          id,
+          description: options.description,
+          paths: options.paths ? splitList(options.paths) : [],
+        });
+        console.log(`Created ${rel}. Edit it, then run \`agent-kit sync\`.`);
+      });
+    });
+
+  const skills = program
+    .command("skills")
+    .description(
+      "List skills from .agent-kit/skills/, their review status and where they're installed",
+    )
+    .option("--path <path>", "Project path", ".")
+    .option("--json", "Print as JSON", false)
+    .action(async (options: { path: string; json?: boolean }) => {
+      await run(async () => {
+        const result = await listSkills({ path: options.path }, deps);
+        if (options.json) {
+          console.log(JSON.stringify(result, null, 2));
+          return;
+        }
+        if (result.skills.length === 0 && result.problems.length === 0) {
+          console.log("No skills yet. Create one with `agent-kit skills new <name>`.");
+          return;
+        }
+        for (const s of result.skills) {
+          console.log(`${s.name}: ${s.description}`);
+          console.log(
+            `  files: ${s.files}${s.scripts.length ? `, executable: ${s.scripts.join(", ")}` : ""}`,
+          );
+          if (s.status === "needs-approval") {
+            console.log(
+              `  ⚠ not installed: contains executable files. Review them, then \`agent-kit skills approve ${s.name}\`.`,
+            );
+          } else {
+            console.log(`  installed as: ${s.outputs.join(", ") || "(no agents enabled)"}`);
+          }
+        }
+        for (const p of result.problems) console.log(`⚠ ${p.source}: ${p.message}`);
+        if (result.problems.length) process.exitCode = ExitCode.INVALID_INPUT;
+      });
+    });
+
+  skills
+    .command("new <name>")
+    .description("Create .agent-kit/skills/<name>/SKILL.md from a template")
+    .option("--path <path>", "Project path", ".")
+    .option("--description <text>", "What the skill does and when to use it")
+    .action(async (name: string, options: { path: string; description?: string }) => {
+      await run(async () => {
+        const rel = await newSkill({ path: options.path, name, description: options.description });
+        console.log(`Created ${rel}. Edit it, then run \`agent-kit sync\`.`);
+      });
+    });
+
+  skills
+    .command("approve <name>")
+    .description(
+      "Approve a skill's executable files at their current content (any edit withdraws approval)",
+    )
+    .option("--path <path>", "Project path", ".")
+    .action(async (name: string, options: { path: string }) => {
+      await run(async () => {
+        const result = await approveSkill({ path: options.path, name }, deps);
+        console.log(
+          `Approved "${result.name}" (${result.hash.slice(0, 12)}…) with executable files:`,
+        );
+        for (const s of result.scripts) console.log(`  ${s}`);
+        console.log("Run `agent-kit sync` to install it. Agent Kit never runs these files.");
+      });
+    });
+
+  program
+    .command("conflicts")
+    .description("Find instructions that contradict the repo or each other (e.g. Jest vs Vitest)")
+    .option("--path <path>", "Project path", ".")
+    .option("--json", "Print as JSON", false)
+    .option("--ci", "Exit with code 2 when conflicts are found", false)
+    .action(async (options: { path: string; json?: boolean; ci?: boolean }) => {
+      await run(async () => {
+        const { conflicts } = await findConflicts({ path: options.path });
+        if (options.json) console.log(JSON.stringify({ conflicts }, null, 2));
+        else if (conflicts.length === 0) console.log("No conflicting instructions found.");
+        else {
+          for (const c of conflicts) {
+            console.log(`⚠ ${c.message}`);
+            for (const s of c.statements) {
+              console.log(
+                `    ${s.file}:${s.line}  ${s.positive ? "" : "(rules out) "}${s.tool}: ${s.text}`,
+              );
+            }
+            console.log("");
+          }
+          console.log("Agent Kit never resolves these itself. Edit the files so they agree.");
+        }
+        if (options.ci && conflicts.length > 0) process.exitCode = ExitCode.INVALID_INPUT;
       });
     });
 

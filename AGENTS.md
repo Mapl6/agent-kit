@@ -44,4 +44,10 @@ Monorepo with packages `packages/cli`, `packages/core`.
 - `packages/cli/tests/`: tests
 - `packages/core/tests/`: tests (likely)
 
+### Rules for specific files
+
+Before changing files that match a pattern below, read that rule:
+
+- Safety invariants for core library code: `packages/core/src/**/*.ts`. See `.agent-kit/rules/core-safety.md`.
+
 <!-- END AGENT-KIT -->

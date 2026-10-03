@@ -5,14 +5,18 @@ import { AppError } from "../errors/AppError.js";
 /**
  * Write file atomically: temp file in same directory, then rename.
  */
-export async function writeFileAtomic(filePath: string, contents: string): Promise<void> {
+export async function writeFileAtomic(filePath: string, contents: string | Buffer): Promise<void> {
   const dir = path.dirname(filePath);
   const base = path.basename(filePath);
   const tmp = path.join(dir, `.${base}.${process.pid}.${Date.now()}.tmp`);
 
   try {
     await fs.mkdir(dir, { recursive: true });
-    await fs.writeFile(tmp, contents, { encoding: "utf8", mode: 0o644 });
+    await fs.writeFile(
+      tmp,
+      contents,
+      typeof contents === "string" ? { encoding: "utf8", mode: 0o644 } : { mode: 0o644 },
+    );
     await fs.rename(tmp, filePath);
   } catch (cause) {
     try {

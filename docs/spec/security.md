@@ -20,14 +20,18 @@ these checks in one place instead of in every detector.
 
 ## Writing agent files (Phase 3)
 
-| Threat                              | Control                                                                                                                                                          |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Overwriting developer content       | Only the text between `BEGIN/END AGENT-KIT` markers is ever replaced; appends go at the end; uninstall restores the original bytes                               |
-| Ambiguous ownership                 | Missing, duplicated or reversed markers mean conflict: nothing written, exit code 2                                                                              |
-| Symlink / path escape on write      | Every path component is checked with `lstat`; a symlink anywhere means conflict. Paths are resolved inside the root only                                         |
-| Losing data                         | Existing files are backed up to `.agent-kit/state/backups/<timestamp>/` before modification or deletion                                                          |
-| Prompt injection via generated text | Repo-derived names render only if they match `^[\w@./+:-]{1,80}$`; otherwise they are omitted. Scan warnings and file contents are never copied into agent files |
-| Editing personal files              | `CLAUDE.local.md` is never modified; a shared `CLAUDE.md` is added instead                                                                                       |
+| Threat                                    | Control                                                                                                                                                                   |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Overwriting developer content             | Only the text between `BEGIN/END AGENT-KIT` markers is ever replaced; appends go at the end; uninstall restores the original bytes                                        |
+| Ambiguous ownership                       | Missing, duplicated or reversed markers mean conflict: nothing written, exit code 2                                                                                       |
+| Symlink / path escape on write            | Every path component is checked with `lstat`; a symlink anywhere means conflict. Paths are resolved inside the root only                                                  |
+| Losing data                               | Existing files are backed up to `.agent-kit/state/backups/<timestamp>/` before modification or deletion                                                                   |
+| Prompt injection via generated text       | Repo-derived names render only if they match `^[\w@./+:-]{1,80}$`; otherwise they are omitted. Scan warnings and file contents are never copied into agent files          |
+| Editing personal files                    | `CLAUDE.local.md` is never modified; a shared `CLAUDE.md` is added instead                                                                                                |
+| Overwriting hand-edited generated files   | Generated files are owned by content hash; any edit, or a same-named file Agent Kit didn't create, is a conflict                                                          |
+| Executable skills                         | Skills with scripts aren't installed until approved; approval is tied to a hash of all files, so an edit withdraws it; copies are never made executable and are never run |
+| Deleting developer work                   | `uninstall` keeps `.agent-kit/rules/` and `.agent-kit/skills/`                                                                                                            |
+| Instruction files as an injection channel | Conflict detection reads them as data; quotes go to the terminal only, never into generated files                                                                         |
 
 ## Rules for future phases
 
