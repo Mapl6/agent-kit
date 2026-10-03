@@ -1,6 +1,6 @@
 {
   "name": "@mapl6/agent-kit-core",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Core library for Agent Kit: safe repository discovery, detectors, and the project model.",
   "type": "module",
   "main": "./dist/index.js",

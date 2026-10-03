@@ -65,6 +65,8 @@ export type ProjectConfig = {
   ignoreGlobs: string[];
   maxFileBytes: number;
   followSymlinks: false;
+  /** Enabled agent adapters (see `agent-kit agents`). Absent until first install. */
+  agents?: string[];
 };
 
 export type ProjectSnapshot = {
@@ -86,7 +88,13 @@ export type ProjectSnapshot = {
 /** A file Agent Kit wrote, or would write under --dry-run. Path is repo-relative. */
 export type PlannedWrite = {
   path: string;
-  action: "create" | "update" | "unchanged";
+  /**
+   * create / update / unchanged: normal writes. remove: an Agent Kit block is
+   * taken out of a file. delete: a file Agent Kit created is removed. skip: left
+   * alone on purpose. conflict: unsafe or ambiguous, nothing written.
+   */
+  action: "create" | "update" | "unchanged" | "remove" | "delete" | "skip" | "conflict";
+  reason?: string;
 };
 
 export type IndexResult = {

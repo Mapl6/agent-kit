@@ -31,7 +31,9 @@ export async function indexProject(options: IndexOptions, deps: IndexDeps): Prom
     });
   }
 
-  const config = await deps.configs.read(projectRoot);
+  // The resolved path wins over the stored one, so a committed .agent-kit/
+  // cloned to another machine indexes the right directory.
+  const config = { ...(await deps.configs.read(projectRoot)), projectRoot };
   return buildProjectIndex(config, {
     snapshots: deps.snapshots,
     models: deps.models,
