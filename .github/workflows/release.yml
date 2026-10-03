@@ -1,0 +1,66 @@
+name: Release
+
+# Publishes @mapl6/agent-kit-core and @mapl6/agent-kit to npm when a version tag
+# (v1.2.3) is pushed. Uses npm Trusted Publishing (OIDC): no npm token is
+# stored in GitHub, and every release gets signed provenance.
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write # create the GitHub Release
+  id-token: write # npm trusted publishing (OIDC)
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      # Trusted publishing needs npm >= 11.5.1.
+      - run: npm install -g npm@latest
+
+      - name: Tag must point at a commit on main
+        run: |
+          git fetch origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main \
+            || { echo "::error::$GITHUB_REF_NAME is not on main"; exit 1; }
+
+      - name: Tag must match package versions and CHANGELOG
+        run: node scripts/release.mjs check "$GITHUB_REF_NAME"
+
+      - run: npm ci
+      - run: npm run check
+
+      # Core first: the CLI depends on the exact same core version.
+      # Already-published versions are skipped so a failed run can be re-run.
+      - name: Publish to npm
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          for PKG in @mapl6/agent-kit-core @mapl6/agent-kit; do
+            if npm view "$PKG@$VERSION" version --prefer-online >/dev/null 2>&1; then
+              echo "$PKG@$VERSION already published, skipping"
+            else
+              npm publish -w "$PKG" --access public
+            fi
+          done
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/release.mjs notes "$GITHUB_REF_NAME" > notes.md
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 \
+            || gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md --verify-tag

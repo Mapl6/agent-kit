@@ -165,7 +165,7 @@ node packages/cli/dist/index.js --path fixtures/monorepo
 | `packages/cli`  | [`@mapl6/agent-kit`](https://www.npmjs.com/package/@mapl6/agent-kit)           | The `agent-kit` CLI                 |
 | `packages/core` | [`@mapl6/agent-kit-core`](https://www.npmjs.com/package/@mapl6/agent-kit-core) | Discovery, detectors, project model |
 
-Architecture and decisions: [docs/spec](https://github.com/Mapl6/agent-kit/tree/main/docs/spec), [docs/decisions](https://github.com/Mapl6/agent-kit/tree/main/docs/decisions). Release history: [CHANGELOG](https://github.com/Mapl6/agent-kit/blob/main/CHANGELOG.md).
+Architecture and decisions: [docs/spec](https://github.com/Mapl6/agent-kit/tree/main/docs/spec), [docs/decisions](https://github.com/Mapl6/agent-kit/tree/main/docs/decisions). Release history: [CHANGELOG](https://github.com/Mapl6/agent-kit/blob/main/CHANGELOG.md). How releases are cut and published: [RELEASING](https://github.com/Mapl6/agent-kit/blob/main/RELEASING.md).
 
 ## License
 

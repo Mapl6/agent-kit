@@ -16,7 +16,8 @@
     "format": "prettier --write \"packages/**/*.{ts,json,md}\" \"docs/**/*.md\" \"*.md\"",
     "agent-kit": "node packages/cli/dist/index.js",
     "check": "npm run build && npm run typecheck && npm run lint && npm test",
-    "release:check": "npm run check && npm pack -w @mapl6/agent-kit-core --dry-run && npm pack -w @mapl6/agent-kit --dry-run"
+    "release:check": "npm run check && npm pack -w @mapl6/agent-kit-core --dry-run && npm pack -w @mapl6/agent-kit --dry-run",
+    "release:version": "node scripts/release.mjs version"
   },
   "engines": {
     "node": ">=20"
