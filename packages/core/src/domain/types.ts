@@ -11,23 +11,43 @@ export type Evidence = {
   detail?: string;
 };
 
-export type TechnologySignal = {
-  id: string;
-  label: string;
-  category: "packageManager" | "runtime" | "framework" | "language" | "tooling" | "other";
-  confidence: Confidence;
-  evidence: Evidence[];
+export type DetectionCategory =
+  | "language"
+  | "runtime"
+  | "packageManager"
+  | "workspace"
+  | "framework"
+  | "testing"
+  | "tooling"
+  | "vcs"
+  | "ci"
+  | "agentConfig";
+
+/**
+ * Where a detection came from. `detected` = read directly from a file or
+ * manifest; `inferred` = a reasonable guess with no direct evidence.
+ */
+export type DetectionSource = {
+  type: "detected" | "inferred";
+  detector: string;
 };
 
+export type Detection = {
+  id: string;
+  label: string;
+  category: DetectionCategory;
+  confidence: Confidence;
+  source: DetectionSource;
+  evidence: Evidence[];
+  /** Repo-relative directory the detection applies to ("." for the root). */
+  location: string;
+};
+
+/** @deprecated Use `Detection`. Kept so existing snapshots and callers still type-check. */
+export type TechnologySignal = Detection;
+
 export type FileKind =
-  | "source"
-  | "config"
-  | "lockfile"
-  | "document"
-  | "asset"
-  | "secret"
-  | "ignored"
-  | "other";
+  "source" | "config" | "lockfile" | "document" | "asset" | "secret" | "ignored" | "other";
 
 export type IndexedFile = {
   path: string;

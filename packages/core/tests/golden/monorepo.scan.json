@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "root": "<root>",
+  "stats": {
+    "files": 12,
+    "skipped": {}
+  },
+  "workspaces": [
+    "apps/api",
+    "apps/web",
+    "packages/ui"
+  ],
+  "detections": [
+    {
+      "id": "typescript",
+      "label": "TypeScript",
+      "category": "language",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "languages"
+      },
+      "evidence": [
+        {
+          "kind": "file",
+          "path": "tsconfig.json"
+        },
+        {
+          "kind": "file-count",
+          "detail": "3 .ts/.tsx/.mts/.cts files"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "nodejs",
+      "label": "Node.js",
+      "category": "runtime",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "node-runtime"
+      },
+      "evidence": [
+        {
+          "kind": "file",
+          "path": "package.json"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "pnpm",
+      "label": "pnpm",
+      "category": "packageManager",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "package-manager"
+      },
+      "evidence": [
+        {
+          "kind": "package-key",
+          "path": "package.json",
+          "detail": "packageManager pnpm@9.15.0"
+        },
+        {
+          "kind": "lockfile",
+          "path": "pnpm-lock.yaml"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "workspaces",
+      "label": "Workspaces (3 packages)",
+      "category": "workspace",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "workspaces"
+      },
+      "evidence": [
+        {
+          "kind": "file",
+          "path": "pnpm-workspace.yaml",
+          "detail": "packages: apps/*, packages/*, !packages/private-*"
+        },
+        {
+          "kind": "workspace",
+          "path": "apps/api"
+        },
+        {
+          "kind": "workspace",
+          "path": "apps/web"
+        },
+        {
+          "kind": "workspace",
+          "path": "packages/ui"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "express",
+      "label": "Express",
+      "category": "framework",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "frameworks"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "express"
+        }
+      ],
+      "location": "apps/api"
+    },
+    {
+      "id": "react",
+      "label": "React",
+      "category": "framework",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "frameworks"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "react"
+        }
+      ],
+      "location": "apps/web"
+    },
+    {
+      "id": "vite",
+      "label": "Vite",
+      "category": "framework",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "frameworks"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "vite"
+        },
+        {
+          "kind": "file",
+          "path": "vite.config.ts"
+        }
+      ],
+      "location": "apps/web"
+    },
+    {
+      "id": "react",
+      "label": "React",
+      "category": "framework",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "frameworks"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "react"
+        }
+      ],
+      "location": "packages/ui"
+    },
+    {
+      "id": "jest",
+      "label": "Jest",
+      "category": "testing",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "testing"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "jest"
+        }
+      ],
+      "location": "apps/api"
+    },
+    {
+      "id": "vitest",
+      "label": "Vitest",
+      "category": "testing",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "testing"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "vitest"
+        }
+      ],
+      "location": "apps/web"
+    },
+    {
+      "id": "prettier",
+      "label": "Prettier",
+      "category": "tooling",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "tooling"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "prettier"
+        }
+      ],
+      "location": "."
+    }
+  ],
+  "warnings": []
+}

@@ -1,0 +1,10 @@
+{
+  "name": "api",
+  "private": true,
+  "dependencies": {
+    "express": "5.0.0"
+  },
+  "devDependencies": {
+    "jest": "29.0.0"
+  }
+}

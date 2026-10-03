@@ -8,7 +8,7 @@ import type {
 import { SNAPSHOT_SCHEMA_VERSION } from "../domain/types.js";
 import { AppError } from "../errors/AppError.js";
 import { discoverFiles, toIndexedFile } from "../discovery/discover.js";
-import { detectTechnologies } from "../detection/technology.js";
+import { scanEntries } from "../scanner/scan.js";
 import type { SnapshotRepository } from "../ports/repositories.js";
 import { hashFileContents, hashSnapshotPayload } from "./hash.js";
 
@@ -21,7 +21,7 @@ export async function buildProjectIndex(
   config: ProjectConfig,
   deps: IndexerDeps,
 ): Promise<IndexResult> {
-  const now = (deps.now ?? (() => new Date))().toISOString();
+  const now = (deps.now ?? (() => new Date()))().toISOString();
 
   try {
     const discovered = await discoverFiles({
@@ -45,7 +45,8 @@ export async function buildProjectIndex(
       files.push(toIndexedFile(entry, contentHash));
     }
 
-    const technologies: TechnologySignal[] = await detectTechnologies(config.projectRoot);
+    const technologies: TechnologySignal[] = (await scanEntries(config.projectRoot, discovered))
+      .detections;
 
     const contentHash = hashSnapshotPayload(
       files.map((f) => `${f.path}:${f.contentHash ?? f.skippedReason ?? ""}:${f.mtimeMs}`),
@@ -75,7 +76,12 @@ export async function buildProjectIndex(
     };
 
     const { added, removed, updated } = diffSnapshots(previous, snapshot);
-    const changed = created || added > 0 || removed > 0 || updated > 0 || previous?.contentHash !== snapshot.contentHash;
+    const changed =
+      created ||
+      added > 0 ||
+      removed > 0 ||
+      updated > 0 ||
+      previous?.contentHash !== snapshot.contentHash;
 
     if (changed) {
       await deps.snapshots.write(snapshot);

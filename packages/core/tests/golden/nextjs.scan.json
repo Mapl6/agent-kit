@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "root": "<root>",
+  "stats": {
+    "files": 8,
+    "skipped": {}
+  },
+  "workspaces": [],
+  "detections": [
+    {
+      "id": "typescript",
+      "label": "TypeScript",
+      "category": "language",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "languages"
+      },
+      "evidence": [
+        {
+          "kind": "file",
+          "path": "tsconfig.json"
+        },
+        {
+          "kind": "file-count",
+          "detail": "2 .ts/.tsx/.mts/.cts files"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "nodejs",
+      "label": "Node.js",
+      "category": "runtime",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "node-runtime"
+      },
+      "evidence": [
+        {
+          "kind": "file",
+          "path": "package.json"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "pnpm",
+      "label": "pnpm",
+      "category": "packageManager",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "package-manager"
+      },
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "path": "pnpm-lock.yaml"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "nextjs",
+      "label": "Next.js",
+      "category": "framework",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "frameworks"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "next"
+        },
+        {
+          "kind": "file",
+          "path": "next.config.ts"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "react",
+      "label": "React",
+      "category": "framework",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "frameworks"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "react"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "playwright",
+      "label": "Playwright",
+      "category": "testing",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "testing"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "@playwright/test"
+        },
+        {
+          "kind": "file",
+          "path": "playwright.config.ts"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "eslint",
+      "label": "ESLint",
+      "category": "tooling",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "tooling"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "eslint"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "prettier",
+      "label": "Prettier",
+      "category": "tooling",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "tooling"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "prettier"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "github-actions",
+      "label": "GitHub Actions",
+      "category": "ci",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "ci"
+      },
+      "evidence": [
+        {
+          "kind": "file",
+          "path": ".github/workflows/ci.yml"
+        }
+      ],
+      "location": "."
+    }
+  ],
+  "warnings": []
+}

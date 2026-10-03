@@ -126,7 +126,8 @@ describe("init / index / status", () => {
     const d = deps();
     const init = await initProject({ path: root }, d);
     expect(fs.existsSync(path.join(root, ".agent-kit", "config.json"))).toBe(true);
-    expect(init.index?.snapshot.technologies.some((t) => t.id === "vite-react")).toBe(true);
+    const techIds = init.index?.snapshot.technologies.map((t) => t.id) ?? [];
+    expect(techIds).toEqual(expect.arrayContaining(["vite", "react", "vitest"]));
 
     const first = await indexProject({ path: root }, d);
     const second = await indexProject({ path: root }, d);

@@ -1,0 +1,4 @@
+---
+applyTo: 'src/**'
+---
+Frontend rules.

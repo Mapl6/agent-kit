@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "root": "<root>",
+  "stats": {
+    "files": 3,
+    "skipped": {}
+  },
+  "workspaces": [],
+  "detections": [
+    {
+      "id": "typescript",
+      "label": "TypeScript",
+      "category": "language",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "languages"
+      },
+      "evidence": [
+        {
+          "kind": "file-count",
+          "detail": "1 .ts/.tsx/.mts/.cts file"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "nodejs",
+      "label": "Node.js",
+      "category": "runtime",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "node-runtime"
+      },
+      "evidence": [
+        {
+          "kind": "file",
+          "path": "package.json"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "npm",
+      "label": "npm",
+      "category": "packageManager",
+      "confidence": "low",
+      "source": {
+        "type": "inferred",
+        "detector": "package-manager"
+      },
+      "evidence": [
+        {
+          "kind": "heuristic",
+          "path": "package.json",
+          "detail": "package.json without lockfile or packageManager field"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "react",
+      "label": "React",
+      "category": "framework",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "frameworks"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "react"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "vite",
+      "label": "Vite",
+      "category": "framework",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "frameworks"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "vite"
+        },
+        {
+          "kind": "file",
+          "path": "vite.config.ts"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "vitest",
+      "label": "Vitest",
+      "category": "testing",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "testing"
+      },
+      "evidence": [
+        {
+          "kind": "dependency",
+          "path": "package.json",
+          "detail": "vitest"
+        }
+      ],
+      "location": "."
+    }
+  ],
+  "warnings": []
+}

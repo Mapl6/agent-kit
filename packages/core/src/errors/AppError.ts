@@ -10,6 +10,7 @@ const EXIT_BY_CODE: Record<ErrorCode, ExitCodeValue> = {
   PERMISSION_DENIED: ExitCode.PERMISSION,
   STORAGE_WRITE_FAILED: ExitCode.STORAGE,
   INDEX_FAILED: ExitCode.INDEX,
+  SCAN_FAILED: ExitCode.INDEX,
 };
 
 export type AppErrorOptions = {

@@ -1,123 +1,89 @@
 # Agent Kit
 
-**Local-first project index and reports for Cursor, Claude Code, Copilot, and other agents.**
+**Make any codebase easier for AI coding agents to understand, work in, verify and maintain.**
 
-`@mapl6/agent-kit` scans a repository safely, stores a reviewable snapshot under `.agent-kit/`, and exports Markdown/JSON plus a copy-paste onboarding prompt. It does **not** call external LLM APIs and does **not** execute project lifecycle scripts while indexing.
+Agent Kit is a local-first project intelligence layer that sits between your repository and the coding agent you already use (Cursor, Claude Code, Codex, Copilot, …). It is not another agent.
 
-Development status and upcoming features: [PROGRESS.md](./PROGRESS.md).
+It starts by **understanding the repository**. `agent-kit scan` reports languages, package managers, workspaces, frameworks, test runners, tooling, CI and existing AI-agent configuration, with evidence for every finding and a clear line between what was _detected_ and what was _inferred_. It's read-only, runs offline, and never executes project code.
+
+Roadmap and status: [PROGRESS.md](./PROGRESS.md) · Specs: [docs/spec/](./docs/spec/)
 
 [![npm](https://img.shields.io/npm/v/@mapl6/agent-kit.svg)](https://www.npmjs.com/package/@mapl6/agent-kit)
 [![license](https://img.shields.io/npm/l/@mapl6/agent-kit.svg)](./LICENSE)
 
 ```bash
-npx @mapl6/agent-kit init
+npx @mapl6/agent-kit          # same as: npx @mapl6/agent-kit scan
 ```
 
-## Installation
+```text
+Agent Kit scan: /work/shop
+412 files (content skipped: 1 secret)
 
-```bash
-# one-shot
-npx @mapl6/agent-kit init
+Languages
+  ✓ TypeScript               high    tsconfig.json; 188 .ts/.tsx/.mts/.cts files
 
-# or install locally
-npm install -D @mapl6/agent-kit
-npx agent-kit init
+Package manager
+  ✓ pnpm                     high    packageManager pnpm@9.15.0; pnpm-lock.yaml
+
+Frameworks
+  ✓ Next.js                  high    dep next; next.config.ts  [apps/web]
+  ✓ React                    high    dep react  [apps/web]
+
+AI agent configuration
+  ✓ AGENTS.md                high    AGENTS.md (2.1 KB)
+  ✓ .cursor/                 high    .cursor/ (3 files)
+...
+✓ detected from files   ~ inferred (no direct evidence)   Nothing was written.
 ```
 
 Requires Node.js **18+**.
 
-## CLI usage
+## Commands
 
-| Command | Description |
-|---|---|
-| `agent-kit init [--path .] [--skip-index] [--force]` | Create `.agent-kit/config.json` and (unless skipped) first index |
-| `agent-kit index [--path .]` | Build or refresh `snapshot.json` (incremental) |
-| `agent-kit status [--path .]` | Show init/index state |
-| `agent-kit report [--path .] [--format both\|markdown\|json]` | Write reports under `.agent-kit/reports/` |
+| Command                                              | Writes                     | Description                                                                                         |
+| ---------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------- |
+| `agent-kit scan [--path .] [--json]`                 | nothing                    | **Default.** Analyze the repository. `--json` prints a stable [ScanResult](./docs/spec/schemas.md). |
+| `agent-kit init [--path .] [--skip-index] [--force]` | `.agent-kit/`              | Create config and the first index snapshot.                                                         |
+| `agent-kit index [--path .]`                         | `.agent-kit/snapshot.json` | Refresh the incremental file index.                                                                 |
+| `agent-kit status [--path .]`                        | nothing                    | Show init/index state.                                                                              |
+| `agent-kit report …`                                 | `.agent-kit/reports/`      | _Deprecated_. Use `scan`.                                                                           |
 
-Examples:
+More commands (`doctor`, `verify`, `sync`, `handoff`, …) arrive phase by phase. See the [CLI spec](./docs/spec/cli.md).
 
-```bash
-npx @mapl6/agent-kit init
-npx @mapl6/agent-kit index
-npx @mapl6/agent-kit status
-npx @mapl6/agent-kit report --format markdown
-```
+## Safety
 
-## What gets written
+- Read-only by default. A bare `agent-kit` never modifies your repo.
+- No project scripts, no subprocesses, no network.
+- Symlinks aren't followed or read, and a symlinked project root is rejected.
+- Secret files (`.env*`, keys, `.npmrc`, `secrets/`) are counted but never read, hashed or printed.
+- Repository files are treated as data. Instructions inside READMEs or `AGENTS.md` are never acted on; agent config files are reported by path and size only.
 
-```text
-.agent-kit/
-  config.json
-  snapshot.json
-  reports/
-    latest.md
-    latest.json
-    onboarding-prompt.md
-```
-
-Snapshots are metadata-first (paths, kinds, hashes, technology signals with evidence). Secret files (e.g. `.env`) and symlinks are never content-hashed or logged as contents.
+Details: [docs/spec/security.md](./docs/spec/security.md).
 
 ## Exit codes
 
-Stable codes for scripting:
+| Code | Meaning                        |
+| ---- | ------------------------------ |
+| 0    | Success                        |
+| 1    | Unexpected error               |
+| 2    | Invalid input or project state |
+| 3    | Permission denied              |
+| 4    | Storage write failure          |
+| 5    | Index or scan failure          |
 
-| Code | Meaning |
-|---|---|
-| 0 | Success |
-| 1 | Unexpected / general error |
-| 2 | Invalid input or project state |
-| 3 | Permission denied |
-| 4 | Storage write failure |
-| 5 | Index failure |
+## Development
 
-Errors print as:
-
-```text
-Error: PROJECT_NOT_FOUND
-The specified project root does not exist.
-Suggested action:
-  Check the path and run the command again.
-```
-
-## Safety guarantees (Phase 1)
-
-- Project root validation (must be a real directory, not a symlink)
-- Symlinks skipped during discovery
-- Secret path patterns ignored for content hashing
-- Max file size for hashed content
-- `package.json` is read as JSON only (no install / no lifecycle scripts)
-- No automatic network/API uploads
-
-## Monorepo layout
-
-| Package | npm name | Role |
-|---|---|---|
-| `packages/cli` | `@mapl6/agent-kit` | Published CLI (`agent-kit`) |
-| `packages/core` | `@mapl6/agent-kit-core` | Domain, storage, indexer, reports |
+| Package         | npm name                | Role                                 |
+| --------------- | ----------------------- | ------------------------------------ |
+| `packages/core` | `@mapl6/agent-kit-core` | Scanner, discovery, indexer, storage |
+| `packages/cli`  | `@mapl6/agent-kit`      | Published CLI (`agent-kit`)          |
 
 ```bash
 npm install
-npm run build
-npm test
-npm run typecheck
+npm test                    # build + all tests
+UPDATE_GOLDEN=1 npm test    # refresh golden scan snapshots after an intended change
+npm run typecheck && npm run lint
+node packages/cli/dist/index.js --path fixtures/monorepo
 ```
 
-## Publishing note
-
-Workspace development may use linked package versions. Before a public release, publish `@mapl6/agent-kit-core` then `@mapl6/agent-kit`, and verify with:
-
-```bash
-npm pack -w @mapl6/agent-kit-core
-npm pack -w @mapl6/agent-kit
-mkdir /tmp/agent-kit-install && cd /tmp/agent-kit-install
-npm init -y
-npm install /path/to/mapl6-agent-kit-core-*.tgz /path/to/mapl6-agent-kit-*.tgz
-npx agent-kit init
-npx agent-kit index
-npx agent-kit init   # should not wipe data; expect ALREADY_INITIALIZED
-```
-
-## Version 2 notes
-
-v2 is a ground-up modular core + Commander CLI. A **lean** Markdown kit for a later scaffold/export phase lives only under `packages/cli/templates` (single copy — no root `templates/` duplicate). Phase 1 default path is `init` / `index` / `status` / `report`.
+Core and CLI are released together at the same version. Publish `@mapl6/agent-kit-core` first, then `@mapl6/agent-kit`.
