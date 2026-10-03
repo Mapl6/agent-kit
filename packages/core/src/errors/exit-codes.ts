@@ -8,7 +8,7 @@
  * | 2    | Invalid input/state  |
  * | 3    | Permission           |
  * | 4    | Storage              |
- * | 5    | Index                |
+ * | 5    | Index / scan         |
  */
 export const ExitCode = {
   SUCCESS: 0,

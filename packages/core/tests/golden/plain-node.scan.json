@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "root": "<root>",
+  "stats": {
+    "files": 1,
+    "skipped": {}
+  },
+  "workspaces": [],
+  "detections": [
+    {
+      "id": "nodejs",
+      "label": "Node.js",
+      "category": "runtime",
+      "confidence": "high",
+      "source": {
+        "type": "detected",
+        "detector": "node-runtime"
+      },
+      "evidence": [
+        {
+          "kind": "file",
+          "path": "package.json"
+        }
+      ],
+      "location": "."
+    },
+    {
+      "id": "npm",
+      "label": "npm",
+      "category": "packageManager",
+      "confidence": "low",
+      "source": {
+        "type": "inferred",
+        "detector": "package-manager"
+      },
+      "evidence": [
+        {
+          "kind": "heuristic",
+          "path": "package.json",
+          "detail": "package.json without lockfile or packageManager field"
+        }
+      ],
+      "location": "."
+    }
+  ],
+  "warnings": []
+}
